@@ -24,19 +24,8 @@ jobs:
       - name: Import signing certificate
         run: |
           echo "${{ secrets.IOS_P12_BASE64 }}" | base64 --decode > cert.p12
-          # p12 为空密码但格式兼容性差，用 python 重新导出为标准 p12
           python3 -m pip install --user cryptography --quiet || true
-          python3 - <<'EOF'
-from cryptography.hazmat.primitives.serialization import pkcs12
-from cryptography.hazmat.primitives.serialization.pkcs12 import serialize_key_and_certificates
-from cryptography.hazmat.primitives.serialization import BestAvailableEncryption
-with open('cert.p12', 'rb') as f:
-    key, cert, extra = pkcs12.load_key_and_certificates(f.read(), b'')
-out = serialize_key_and_certificates(b'key', key, cert, extra, BestAvailableEncryption(b''))
-with open('cert_fixed.p12', 'wb') as f:
-    f.write(out)
-print('p12 converted to standard format')
-EOF
+          python3 scripts/convert_p12.py
           security create-keychain -p "" build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "" build.keychain
