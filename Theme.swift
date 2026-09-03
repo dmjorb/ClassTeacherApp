@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 // MARK: - iOS 原生设计系统
 // 遵循 Apple Human Interface Guidelines
@@ -13,7 +14,7 @@ enum AppTheme {
         
         static let primaryText = Color.primary
         static let secondaryText = Color.secondary
-        static let tertiaryText = Color.tertiary
+        static let tertiaryText = Color(.tertiaryLabel)
         
         static let separator = Color(.separator)
         static let opaqueSeparator = Color(.opaqueSeparator)
@@ -71,7 +72,7 @@ enum AppTheme {
         static let medium: CGFloat = 12
         static let large: CGFloat = 16
         static let xLarge: CGFloat = 20
-        static let continuous = ContinuousRoundedRectangle.cornerRadius(12)
+        static let continuous: CGFloat = 12
     }
 }
 

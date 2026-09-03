@@ -115,21 +115,21 @@ class AppViewModel: ObservableObject {
         return max(0, expected - recorded)
     }
     func totalRanking(for examName: String) -> [(student: Student, total: Double, average: Double, rank: Int)] {
-        var result: [(Student, Double, Double, Int)] = []
+        var result: [(student: Student, total: Double, average: Double, rank: Int)] = []
         for student in students {
             let scores = scoreRecords.filter { $0.studentId == student.id && $0.examName == examName }
             let total = scores.reduce(0) { $0 + $1.score }
             let average = scores.isEmpty ? 0 : total / Double(scores.count)
-            result.append((student, total, average, 0))
+            result.append((student: student, total: total, average: average, rank: 0))
         }
-        result.sort { $0.1 > $1.1 }
+        result.sort { $0.total > $1.total }
         for i in 0..<result.count { result[i].rank = i + 1 }
         return result
     }
     
     // MARK: - 考试
     func addExam(name: String, type: Exam.ExamType, subjects: [String], date: Date = Date()) {
-        exams.append(Exam(name: name, type: type, subjects: subjects, date: date))
+        exams.append(Exam(name: name, type: type, date: date, subjects: subjects))
     }
     func deleteExam(_ exam: Exam) {
         exams.removeAll { $0.id == exam.id }

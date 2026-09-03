@@ -226,3 +226,60 @@ struct RoundedCorner: Shape {
         return Path(path.cgPath)
     }
 }
+
+// 照片详情
+struct PhotoDetailView: View {
+    let photo: AlbumPhoto
+    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var viewModel: AppViewModel
+    
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    if let image = viewModel.loadImage(for: photo) {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.black.opacity(0.05))
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(photo.title)
+                            .font(.title2)
+                            .fontWeight(.bold)
+                        Text(formattedDate(photo.date))
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        if !photo.description.isEmpty {
+                            Text(photo.description)
+                                .font(.body)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+                    .background(Color(.secondarySystemGroupedBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                }
+                .padding()
+            }
+            .background(Color(.systemGroupedBackground))
+            .navigationTitle(photo.title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("关闭") { dismiss() }
+                }
+            }
+        }
+    }
+    
+    private func formattedDate(_ date: Date) -> String {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "zh_CN")
+        f.dateFormat = "yyyy年M月d日 HH:mm"
+        return f.string(from: date)
+    }
+}
