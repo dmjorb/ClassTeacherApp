@@ -8,7 +8,7 @@ from cryptography.hazmat.primitives.serialization import BestAvailableEncryption
 with open('cert.p12', 'rb') as f:
     key, cert, extra = pkcs12.load_key_and_certificates(f.read(), b'')
 
-out = serialize_key_and_certificates(b'key', key, cert, extra, BestAvailableEncryption(b''))
+out = serialize_key_and_certificates(b'key', key, cert, extra, BestAvailableEncryption(b'123456'))
 with open('cert_fixed.p12', 'wb') as f:
     f.write(out)
 print('p12 converted to standard format')
