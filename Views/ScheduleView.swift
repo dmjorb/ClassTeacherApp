@@ -1,117 +1,187 @@
 import SwiftUI
 
-// 班级课表（周视图网格 - 对齐网页版）
+// 班级课表（周视图）
 struct ScheduleView: View {
     @EnvironmentObject var viewModel: AppViewModel
-    
-    let days = ["周一", "周二", "周三", "周四", "周五"]
-    let periods = [
-        (1, "08:00", "08:45"), (2, "08:55", "09:40"),
-        (3, "10:00", "10:45"), (4, "10:55", "11:40"),
-        (5, "14:00", "14:45"), (6, "14:55", "15:40"),
-        (7, "15:50", "16:35"), (8, "16:45", "17:30")
-    ]
-    
+    @State private var selectedSlot: ScheduleSlot?
+
+    private let weekdays = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
+    private let colWidth: CGFloat = 46
+
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                Text("2026-2027学年 上学期")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .padding(.top)
-                
-                VStack(spacing: 2) {
+        ScrollView([.horizontal, .vertical]) {
+            VStack(spacing: 2) {
+                // 表头
+                HStack(spacing: 2) {
+                    Text("节")
+                        .font(.caption.weight(.bold))
+                        .frame(width: 30, height: 34)
+                    ForEach(1...7, id: \.self) { weekday in
+                        Text(weekdays[weekday - 1])
+                            .font(.caption.weight(.semibold))
+                            .frame(width: colWidth, height: 34)
+                            .background(weekday == viewModel.todayDayOfWeek ? Color.accentColor.opacity(0.2) : Color.clear)
+                            .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+                    }
+                }
+                // 节次
+                ForEach(1...8, id: \.self) { period in
                     HStack(spacing: 2) {
-                        Text("").frame(width: 60, height: 50)
-                        ForEach(days, id: \.self) { day in
-                            Text(day).font(.subheadline).fontWeight(.medium)
-                                .frame(maxWidth: .infinity).frame(height: 50)
-                                .background(Color(.systemGray6))
-                        }
-                    }
-                    
-                    ForEach(0..<8, id: \.self) { periodIndex in
-                        if periodIndex == 4 {
-                            HStack(spacing: 2) {
-                                Text("午休").font(.caption).foregroundColor(.orange).frame(width: 60, height: 30)
-                                Text("午 休").font(.subheadline).fontWeight(.medium).foregroundColor(.orange)
-                                    .frame(maxWidth: .infinity).frame(height: 30)
-                                    .background(Color.orange.opacity(0.1))
-                            }
-                        }
-                        
-                        HStack(spacing: 2) {
-                            VStack(spacing: 2) {
-                                Text("第\(periods[periodIndex].0)节").font(.caption2).fontWeight(.medium)
-                                Text(periods[periodIndex].1).font(.system(size: 8)).foregroundColor(.secondary)
-                                Text(periods[periodIndex].2).font(.system(size: 8)).foregroundColor(.secondary)
-                            }
-                            .frame(width: 60, height: 60).background(Color(.systemGray6))
-                            
-                            ForEach(1...5, id: \.self) { day in
-                                if let course = viewModel.course(for: day, period: periods[periodIndex].0) {
-                                    courseCell(course)
-                                } else {
-                                    Color.clear.frame(maxWidth: .infinity).frame(height: 60)
-                                }
-                            }
+                        Text("\(period)")
+                            .font(.caption2.weight(.medium))
+                            .foregroundColor(.secondary)
+                            .frame(width: 30, height: 52)
+                        ForEach(1...7, id: \.self) { weekday in
+                            cell(weekday: weekday, period: period)
                         }
                     }
                 }
-                .padding(.horizontal, 4)
-                .background(Color(.systemBackground))
-                .cornerRadius(12)
-                .padding(.horizontal)
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("图例").font(.caption).foregroundColor(.secondary)
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 8) {
-                        ForEach(subjectColors, id: \.name) { item in
-                            HStack(spacing: 4) {
-                                Circle().fill(item.color).frame(width: 10, height: 10)
-                                Text(item.name).font(.caption2)
-                            }
-                        }
-                    }
-                }
-                .padding()
-                .background(Color(.systemBackground))
-                .cornerRadius(12)
-                .padding(.horizontal)
-                .padding(.bottom, 20)
             }
+            .padding()
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("班级课表")
-        .navigationBarTitleDisplayMode(.inline)
+        .sheet(item: $selectedSlot) { slot in
+            CourseEditSheet(weekday: slot.weekday, period: slot.period)
+        }
     }
-    
-    private func courseCell(_ course: Course) -> some View {
-        let isMyCourse = viewModel.isMyCourse(course)
-        return VStack(spacing: 2) {
-            Text(course.subject).font(.caption).fontWeight(.medium)
-                .foregroundColor(isMyCourse ? .white : subjectColor(course.subject))
-            if isMyCourse {
-                Image(systemName: "star.fill").font(.system(size: 8)).foregroundColor(.yellow)
+
+    @ViewBuilder
+    private func cell(weekday: Int, period: Int) -> some View {
+        let course = viewModel.courses(for: weekday).first { $0.period == period }
+        Button {
+            selectedSlot = ScheduleSlot(weekday: weekday, period: period)
+        } label: {
+            Group {
+                if let course = course {
+                    VStack(spacing: 2) {
+                        Text(course.subject)
+                            .font(.caption2.weight(.semibold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
+                        if !course.teacher.isEmpty {
+                            Text(course.teacher)
+                                .font(.system(size: 9))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.6)
+                        }
+                    }
+                    .frame(width: colWidth, height: 52)
+                    .background(courseColor(course.subject).opacity(0.2))
+                    .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 6, style: .continuous).stroke(courseColor(course.subject), lineWidth: 1))
+                } else {
+                    Rectangle()
+                        .fill(Color(.secondarySystemGroupedBackground))
+                        .frame(width: colWidth, height: 52)
+                        .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+                }
             }
         }
-        .frame(maxWidth: .infinity).frame(height: 60)
-        .background(isMyCourse ? Color.orange : subjectColor(course.subject).opacity(0.15))
-        .cornerRadius(6)
-        .overlay(RoundedRectangle(cornerRadius: 6).stroke(isMyCourse ? Color.orange : Color.clear, lineWidth: 2))
+        .buttonStyle(.plain)
     }
-    
-    private func subjectColor(_ subject: String) -> Color {
-        subjectColors.first { $0.name == subject }?.color ?? .gray
+
+    private func courseColor(_ subject: String) -> Color {
+        let palette: [Color] = [.blue, .orange, .purple, .green, .pink, .teal, .indigo, .brown]
+        var hash = 0
+        for scalar in subject.unicodeScalars {
+            hash = (hash &* 31 &+ Int(scalar.value)) & 0x7fffffff
+        }
+        return palette[hash % palette.count]
     }
-    
-    private var subjectColors: [(name: String, color: Color)] {
-        [
-            ("语文", .red), ("数学", .blue), ("英语", .green),
-            ("物理", .orange), ("化学", .purple), ("生物", .mint),
-            ("政治", .pink), ("历史", .brown), ("地理", .teal),
-            ("体育", .indigo), ("音乐", .cyan), ("美术", .yellow),
-            ("信息", .blue), ("劳动", .green), ("自习", .gray), ("班会", .orange)
-        ]
+}
+
+// 可选的课表格
+struct ScheduleSlot: Identifiable {
+    let id = UUID()
+    let weekday: Int
+    let period: Int
+}
+
+// 课程添加/编辑弹窗
+struct CourseEditSheet: View {
+    @EnvironmentObject var viewModel: AppViewModel
+    @Environment(\.dismiss) private var dismiss
+    let weekday: Int
+    let period: Int
+
+    @State private var subject = ""
+    @State private var classroom = ""
+    @State private var teacher = ""
+
+    private var existing: Course? {
+        viewModel.courses(for: weekday).first { $0.period == period }
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                if existing != nil {
+                    Section("第\(period)节 · 已有课程") {
+                        Picker("科目", selection: $subject) {
+                            ForEach(viewModel.classInfo.subjects, id: \.self) { s in
+                                Text(s).tag(s)
+                            }
+                        }
+                        TextField("教室", text: $classroom)
+                        TextField("任课老师", text: $teacher)
+                    }
+                    Section {
+                        Button("删除这节课", systemImage: "trash", role: .destructive) {
+                            if let course = existing {
+                                viewModel.deleteCourse(course)
+                            }
+                            dismiss()
+                        }
+                    }
+                } else {
+                    Section("第\(period)节 · 添加课程") {
+                        Picker("科目", selection: $subject) {
+                            ForEach(viewModel.classInfo.subjects, id: \.self) { s in
+                                Text(s).tag(s)
+                            }
+                        }
+                        TextField("教室（选填）", text: $classroom)
+                        TextField("任课老师（选填）", text: $teacher)
+                    }
+                }
+            }
+            .navigationTitle("\(weekdayName(weekday)) 第\(period)节")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("取消") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("保存") {
+                        if let course = existing {
+                            var updated = course
+                            updated.subject = subject
+                            updated.classroom = classroom
+                            updated.teacher = teacher
+                            viewModel.deleteCourse(course)
+                            viewModel.addCourse(updated)
+                        } else if !subject.isEmpty {
+                            viewModel.addCourse(Course(subject: subject, dayOfWeek: weekday, period: period, classroom: classroom, teacher: teacher))
+                        }
+                        dismiss()
+                    }
+                    .disabled(subject.isEmpty)
+                }
+            }
+            .onAppear {
+                if let course = existing {
+                    subject = course.subject
+                    classroom = course.classroom
+                    teacher = course.teacher
+                } else if let first = viewModel.classInfo.subjects.first {
+                    subject = first
+                }
+            }
+        }
+    }
+
+    private func weekdayName(_ weekday: Int) -> String {
+        ["周一", "周二", "周三", "周四", "周五", "周六", "周日"][weekday - 1]
     }
 }

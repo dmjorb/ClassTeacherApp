@@ -10,45 +10,35 @@
 		B10000000000000000000001 /* ClassTeacherApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000001 /* ClassTeacherApp.swift */; };
 		B10000000000000000000002 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000002 /* Theme.swift */; };
 		B10000000000000000000003 /* Student.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000003 /* Student.swift */; };
-		B10000000000000000000004 /* MockData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000004 /* MockData.swift */; };
-		B10000000000000000000005 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000005 /* DataManager.swift */; };
-		B10000000000000000000006 /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000006 /* AppViewModel.swift */; };
-		B10000000000000000000007 /* StudentListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000007 /* StudentListView.swift */; };
-		B10000000000000000000008 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000008 /* SettingsView.swift */; };
-		B10000000000000000000009 /* SeatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000009 /* SeatView.swift */; };
-		B1000000000000000000000A /* ScoreDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000A /* ScoreDetailView.swift */; };
-		B1000000000000000000000B /* ScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000B /* ScheduleView.swift */; };
-		B1000000000000000000000C /* RankingAndProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000C /* RankingAndProfileView.swift */; };
-		B1000000000000000000000D /* NotificationViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000D /* NotificationViews.swift */; };
-		B1000000000000000000000E /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000E /* MapView.swift */; };
-		B1000000000000000000000F /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000F /* HomeView.swift */; };
-		B10000000000000000000010 /* ExamListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000010 /* ExamListView.swift */; };
-		B10000000000000000000011 /* DutyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000011 /* DutyView.swift */; };
-		B10000000000000000000012 /* AlbumListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000012 /* AlbumListView.swift */; };
-		B10000000000000000000013 /* AlbumDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000013 /* AlbumDetailView.swift */; };
+		B10000000000000000000004 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000004 /* DataManager.swift */; };
+		B10000000000000000000005 /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000005 /* AppViewModel.swift */; };
+		B10000000000000000000006 /* DutyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000006 /* DutyView.swift */; };
+		B10000000000000000000007 /* ExamListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000007 /* ExamListView.swift */; };
+		B10000000000000000000008 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000008 /* HomeView.swift */; };
+		B10000000000000000000009 /* RankingAndProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000009 /* RankingAndProfileView.swift */; };
+		B1000000000000000000000A /* ScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000A /* ScheduleView.swift */; };
+		B1000000000000000000000B /* ScoreDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000B /* ScoreDetailView.swift */; };
+		B1000000000000000000000C /* SeatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000C /* SeatView.swift */; };
+		B1000000000000000000000D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000D /* SettingsView.swift */; };
+		B1000000000000000000000E /* StudentListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000E /* StudentListView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		A10000000000000000000001 /* ClassTeacherApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassTeacherApp.swift; sourceTree = "<group>"; };
 		A10000000000000000000002 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		A10000000000000000000003 /* Student.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Student.swift; sourceTree = "<group>"; };
-		A10000000000000000000004 /* MockData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockData.swift; sourceTree = "<group>"; };
-		A10000000000000000000005 /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
-		A10000000000000000000006 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
-		A10000000000000000000007 /* StudentListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentListView.swift; sourceTree = "<group>"; };
-		A10000000000000000000008 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		A10000000000000000000009 /* SeatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeatView.swift; sourceTree = "<group>"; };
-		A1000000000000000000000A /* ScoreDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreDetailView.swift; sourceTree = "<group>"; };
-		A1000000000000000000000B /* ScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleView.swift; sourceTree = "<group>"; };
-		A1000000000000000000000C /* RankingAndProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankingAndProfileView.swift; sourceTree = "<group>"; };
-		A1000000000000000000000D /* NotificationViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationViews.swift; sourceTree = "<group>"; };
-		A1000000000000000000000E /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
-		A1000000000000000000000F /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		A10000000000000000000010 /* ExamListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExamListView.swift; sourceTree = "<group>"; };
-		A10000000000000000000011 /* DutyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DutyView.swift; sourceTree = "<group>"; };
-		A10000000000000000000012 /* AlbumListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumListView.swift; sourceTree = "<group>"; };
-		A10000000000000000000013 /* AlbumDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumDetailView.swift; sourceTree = "<group>"; };
-		A10000000000000000000014 /* ClassTeacherApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ClassTeacherApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000004 /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
+		A10000000000000000000005 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
+		A10000000000000000000006 /* DutyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DutyView.swift; sourceTree = "<group>"; };
+		A10000000000000000000007 /* ExamListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExamListView.swift; sourceTree = "<group>"; };
+		A10000000000000000000008 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		A10000000000000000000009 /* RankingAndProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankingAndProfileView.swift; sourceTree = "<group>"; };
+		A1000000000000000000000A /* ScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleView.swift; sourceTree = "<group>"; };
+		A1000000000000000000000B /* ScoreDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreDetailView.swift; sourceTree = "<group>"; };
+		A1000000000000000000000C /* SeatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeatView.swift; sourceTree = "<group>"; };
+		A1000000000000000000000D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A1000000000000000000000E /* StudentListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentListView.swift; sourceTree = "<group>"; };
+		A1000000000000000000000F /* ClassTeacherApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ClassTeacherApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,7 +68,7 @@
 		1A0000000000000000000003 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A10000000000000000000014 /* ClassTeacherApp.app */,
+				A1000000000000000000000F /* ClassTeacherApp.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -86,19 +76,15 @@
 		1A0000000000000000000011 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				A1000000000000000000000F /* HomeView.swift */,
-				A10000000000000000000007 /* StudentListView.swift */,
-				A10000000000000000000010 /* ExamListView.swift */,
-				A1000000000000000000000A /* ScoreDetailView.swift */,
-				A10000000000000000000009 /* SeatView.swift */,
-				A1000000000000000000000B /* ScheduleView.swift */,
-				A10000000000000000000011 /* DutyView.swift */,
-				A10000000000000000000012 /* AlbumListView.swift */,
-				A10000000000000000000013 /* AlbumDetailView.swift */,
-				A1000000000000000000000D /* NotificationViews.swift */,
-				A1000000000000000000000C /* RankingAndProfileView.swift */,
-				A1000000000000000000000E /* MapView.swift */,
-				A10000000000000000000008 /* SettingsView.swift */,
+				A10000000000000000000008 /* HomeView.swift */,
+				A1000000000000000000000E /* StudentListView.swift */,
+				A10000000000000000000007 /* ExamListView.swift */,
+				A1000000000000000000000B /* ScoreDetailView.swift */,
+				A1000000000000000000000A /* ScheduleView.swift */,
+				A10000000000000000000006 /* DutyView.swift */,
+				A1000000000000000000000C /* SeatView.swift */,
+				A10000000000000000000009 /* RankingAndProfileView.swift */,
+				A1000000000000000000000D /* SettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -106,7 +92,7 @@
 		1A0000000000000000000012 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				A10000000000000000000006 /* AppViewModel.swift */,
+				A10000000000000000000005 /* AppViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -114,8 +100,7 @@
 		1A0000000000000000000013 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				A10000000000000000000004 /* MockData.swift */,
-				A10000000000000000000005 /* DataManager.swift */,
+				A10000000000000000000004 /* DataManager.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -145,7 +130,7 @@
 			);
 			name = ClassTeacherApp;
 			productName = ClassTeacherApp;
-			productReference = A10000000000000000000014 /* ClassTeacherApp.app */;
+			productReference = A1000000000000000000000F /* ClassTeacherApp.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -199,22 +184,17 @@
 				B10000000000000000000001 /* ClassTeacherApp.swift in Sources */,
 				B10000000000000000000002 /* Theme.swift in Sources */,
 				B10000000000000000000003 /* Student.swift in Sources */,
-				B10000000000000000000004 /* MockData.swift in Sources */,
-				B10000000000000000000005 /* DataManager.swift in Sources */,
-				B10000000000000000000006 /* AppViewModel.swift in Sources */,
-				B10000000000000000000007 /* StudentListView.swift in Sources */,
-				B10000000000000000000008 /* SettingsView.swift in Sources */,
-				B10000000000000000000009 /* SeatView.swift in Sources */,
-				B1000000000000000000000A /* ScoreDetailView.swift in Sources */,
-				B1000000000000000000000B /* ScheduleView.swift in Sources */,
-				B1000000000000000000000C /* RankingAndProfileView.swift in Sources */,
-				B1000000000000000000000D /* NotificationViews.swift in Sources */,
-				B1000000000000000000000E /* MapView.swift in Sources */,
-				B1000000000000000000000F /* HomeView.swift in Sources */,
-				B10000000000000000000010 /* ExamListView.swift in Sources */,
-				B10000000000000000000011 /* DutyView.swift in Sources */,
-				B10000000000000000000012 /* AlbumListView.swift in Sources */,
-				B10000000000000000000013 /* AlbumDetailView.swift in Sources */,
+				B10000000000000000000004 /* DataManager.swift in Sources */,
+				B10000000000000000000005 /* AppViewModel.swift in Sources */,
+				B10000000000000000000006 /* DutyView.swift in Sources */,
+				B10000000000000000000007 /* ExamListView.swift in Sources */,
+				B10000000000000000000008 /* HomeView.swift in Sources */,
+				B10000000000000000000009 /* RankingAndProfileView.swift in Sources */,
+				B1000000000000000000000A /* ScheduleView.swift in Sources */,
+				B1000000000000000000000B /* ScoreDetailView.swift in Sources */,
+				B1000000000000000000000C /* SeatView.swift in Sources */,
+				B1000000000000000000000D /* SettingsView.swift in Sources */,
+				B1000000000000000000000E /* StudentListView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

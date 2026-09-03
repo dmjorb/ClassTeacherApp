@@ -1,158 +1,181 @@
 import SwiftUI
 
-// 值日表（彩色卡片 - 对齐网页版）
+// 值日表
 struct DutyView: View {
     @EnvironmentObject var viewModel: AppViewModel
-    
-    let dayColors: [(bg: Color, border: Color, text: Color)] = [
-        (Color.green.opacity(0.1), Color.green.opacity(0.3), Color.green),
-        (Color.green.opacity(0.08), Color.green.opacity(0.2), Color.green),
-        (Color.yellow.opacity(0.15), Color.yellow.opacity(0.4), Color.orange),
-        (Color.purple.opacity(0.1), Color.purple.opacity(0.3), Color.purple),
-        (Color.pink.opacity(0.1), Color.pink.opacity(0.3), Color.pink)
-    ]
-    
-    let days = ["周一", "周二", "周三", "周四", "周五"]
-    
+    @State private var editingGroup: DutyGroup?
+
+    private var sortedGroups: [DutyGroup] {
+        viewModel.dutyGroups.sorted { $0.groupNumber < $1.groupNumber }
+    }
+
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("本周值日安排")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                    Text("周一至周五 · 每天一组轮流")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                .padding(.top)
-                .padding(.horizontal)
-                
-                if viewModel.dutyGroups.isEmpty {
+        Group {
+            if viewModel.dutyGroups.isEmpty {
+                EmptyStateView(
+                    systemImage: "broom",
+                    title: "还没有值日组",
+                    message: "点击右上角 + 创建值日组并安排成员"
+                )
+            } else {
+                ScrollView {
                     VStack(spacing: 16) {
-                        Image(systemName: "checklist")
-                            .font(.system(size: 64))
-                            .foregroundColor(.gray)
-                        Text("还没有值日安排")
-                            .font(.title2)
-                            .fontWeight(.medium)
+                        currentDutyCard
+                        groupsSection
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, 60)
-                } else {
-                    ForEach(0..<min(5, viewModel.dutyGroups.count), id: \.self) { index in
-                        dutyDayCard(day: days[index], group: viewModel.dutyGroups[index], colors: dayColors[index])
-                    }
-                    
-                    Text("周六、周日无值日安排")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 20)
+                    .padding()
                 }
+                .background(Color(.systemGroupedBackground))
             }
         }
-        .background(Color(.systemGroupedBackground))
         .navigationTitle("值日表")
-        .navigationBarTitleDisplayMode(.inline)
-    }
-    
-    private func dutyDayCard(day: String, group: DutyGroup, colors: (bg: Color, border: Color, text: Color)) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text(day)
-                    .font(.title3)
-                    .fontWeight(.bold)
-                Spacer()
-                Text("第\(group.groupNumber)组")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .foregroundColor(colors.text)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 4)
-                    .background(colors.bg)
-                    .cornerRadius(8)
-            }
-            
-            HStack {
-                FlexibleView(data: group.studentIds.map { viewModel.studentName(for: $0) }) { name in
-                    Text(name)
-                        .font(.subheadline)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(Color.white)
-                        .cornerRadius(8)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    let maxGroup = viewModel.dutyGroups.map(\.groupNumber).max() ?? 0
+                    viewModel.addDutyGroup(DutyGroup(groupNumber: maxGroup + 1))
+                } label: {
+                    Image(systemName: "plus")
                 }
+                .disabled(viewModel.students.isEmpty)
+            }
+        }
+        .sheet(item: $editingGroup) { group in
+            NavigationStack {
+                DutyGroupEditView(group: group)
+            }
+        }
+    }
+
+    // 当前值日组
+    private var currentDutyCard: some View {
+        let current = viewModel.currentDutyGroup
+        return VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("当前值日")
+                    .font(.headline)
                 Spacer()
-                Text("\(group.studentIds.count)人")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                Button("换下一组") {
+                    withAnimation { viewModel.nextDutyGroup() }
+                }
+                .font(.subheadline)
+                .foregroundColor(.accentColor)
+            }
+
+            if let current = current {
+                HStack(spacing: 14) {
+                    Text("\(current.groupNumber)")
+                        .font(.largeTitle.bold())
+                        .foregroundColor(.white)
+                        .frame(width: 64, height: 64)
+                        .background(Color.accentColor)
+                        .clipShape(Circle())
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("第\(current.groupNumber)值日组")
+                            .font(.title3.weight(.semibold))
+                        Text(viewModel.dutyStudentNames(of: current))
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                }
+                .padding(16)
+                .background(Color(.secondarySystemGroupedBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             }
         }
-        .padding()
-        .background(colors.bg)
-        .cornerRadius(16)
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(colors.border, lineWidth: 1)
-        )
-        .padding(.horizontal)
+    }
+
+    // 组列表
+    private var groupsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("值日组")
+                .font(.headline)
+
+            VStack(spacing: 0) {
+                ForEach(Array(sortedGroups.enumerated()), id: \.element.id) { index, group in
+                    Button {
+                        editingGroup = group
+                    } label: {
+                        HStack(spacing: 12) {
+                            Text("第\(group.groupNumber)组")
+                                .font(.body.weight(.semibold))
+                                .foregroundColor(.primary)
+                                .frame(width: 72, alignment: .leading)
+                            Text(viewModel.dutyStudentNames(of: group).isEmpty ? "未安排成员" : viewModel.dutyStudentNames(of: group))
+                                .font(.subheadline)
+                                .foregroundColor(viewModel.dutyStudentNames(of: group).isEmpty ? .secondary : .primary)
+                                .lineLimit(1)
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 14)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    if index < sortedGroups.count - 1 {
+                        Divider().padding(.leading, 16)
+                    }
+                }
+            }
+            .background(Color(.secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        }
     }
 }
 
-// 流式布局（使用 iOS 16 Layout 协议，更稳定）
-struct FlexibleView<Data: Collection, Content: View>: View where Data.Element: Hashable {
-    let data: Data
-    let content: (Data.Element) -> Content
-    
+// 值日组编辑（成员多选）
+struct DutyGroupEditView: View {
+    @EnvironmentObject var viewModel: AppViewModel
+    @Environment(\.dismiss) private var dismiss
+    let group: DutyGroup
+
+    @State private var selectedIds: Set<UUID> = []
+
     var body: some View {
-        WrappingHStackLayout {
-            ForEach(Array(data), id: \.self) { item in
-                content(item)
-                    .padding(.trailing, 8)
-                    .padding(.bottom, 8)
+        Form {
+            Section("第\(group.groupNumber)组 · 选择成员") {
+                ForEach(viewModel.students) { student in
+                    Button {
+                        if selectedIds.contains(student.id) {
+                            selectedIds.remove(student.id)
+                        } else {
+                            selectedIds.insert(student.id)
+                        }
+                    } label: {
+                        HStack {
+                            Text(student.name)
+                            Spacer()
+                            if selectedIds.contains(student.id) {
+                                Image(systemName: "checkmark")
+                                    .foregroundColor(.accentColor)
+                            }
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
             }
         }
-    }
-}
-
-// 自动换行的 HStack Layout
-struct WrappingHStackLayout: Layout {
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let width = proposal.width ?? 300
-        var height: CGFloat = 0
-        var rowWidth: CGFloat = 0
-        var rowHeight: CGFloat = 0
-        
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-            if rowWidth + size.width > width && rowWidth > 0 {
-                height += rowHeight
-                rowWidth = 0
-                rowHeight = 0
+        .navigationTitle("第\(group.groupNumber)值日组")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("取消") { dismiss() }
             }
-            rowWidth += size.width
-            rowHeight = max(rowHeight, size.height)
+            ToolbarItem(placement: .confirmationAction) {
+                Button("保存") {
+                    if let i = viewModel.dutyGroups.firstIndex(where: { $0.id == group.id }) {
+                        viewModel.dutyGroups[i].studentIds = Array(selectedIds)
+                    }
+                    dismiss()
+                }
+            }
         }
-        height += rowHeight
-        return CGSize(width: width, height: height)
-    }
-    
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        var x = bounds.minX
-        var y = bounds.minY
-        var rowHeight: CGFloat = 0
-        
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-            if x + size.width > bounds.maxX && x > bounds.minX {
-                x = bounds.minX
-                y += rowHeight
-                rowHeight = 0
-            }
-            subview.place(at: CGPoint(x: x, y: y), proposal: .unspecified)
-            x += size.width
-            rowHeight = max(rowHeight, size.height)
+        .onAppear {
+            selectedIds = Set(group.studentIds)
         }
     }
 }
