@@ -1,4 +1,4 @@
-name: Build IPA (Signed)
+name: Build IPA
 
 on:
   workflow_dispatch:
@@ -12,54 +12,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install provisioning profile
-        run: |
-          mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
-          echo "${{ secrets.IOS_MOBILEPROVISION_BASE64 }}" | base64 --decode > "$HOME/Library/MobileDevice/Provisioning Profiles/embedded.mobileprovision"
-          security cms -D -i "$HOME/Library/MobileDevice/Provisioning Profiles/embedded.mobileprovision" -o /tmp/profile.plist
-          PROFILE_UUID=$(/usr/libexec/PlistBuddy -c "Print :UUID" /tmp/profile.plist)
-          echo "Profile UUID=${PROFILE_UUID}"
-          cp "$HOME/Library/MobileDevice/Provisioning Profiles/embedded.mobileprovision" "$HOME/Library/MobileDevice/Provisioning Profiles/${PROFILE_UUID}.mobileprovision"
-
-      - name: Import signing certificate
-        run: |
-          echo "${{ secrets.IOS_P12_BASE64 }}" | base64 --decode > cert.p12
-          python3 -m pip install --user cryptography --quiet || true
-          python3 scripts/convert_p12.py
-          security create-keychain -p "" build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "" build.keychain
-          security import cert_fixed.p12 -k build.keychain -P "123456" -T /usr/bin/codesign -T /usr/bin/security
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "" build.keychain
-          security list-keychains -d user -s build.keychain
-
-      - name: Build signed app
+      - name: Build app (unsigned)
         run: |
           xcodebuild -project ClassTeacherApp.xcodeproj \
             -scheme ClassTeacherApp \
             -configuration Release \
             -sdk iphoneos \
             -derivedDataPath build \
-            DEVELOPMENT_TEAM=CT8QZ7352B \
-            CODE_SIGN_STYLE=Manual \
-            CODE_SIGN_IDENTITY="iPhone Developer" \
-            PROVISIONING_PROFILE_SPECIFIER="iOS Team Provisioning Profile: com.mjorb.seal.CT8QZ7352B" \
+            CODE_SIGNING_ALLOWED=NO \
             build
 
       - name: Package IPA
         run: |
           mkdir -p Payload
           cp -R "build/Build/Products/Release-iphoneos/ClassTeacherApp.app" Payload/
-          zip -r ClassTeacherApp-signed.ipa Payload
+          zip -r ClassTeacherApp-unsigned.ipa Payload
 
-      - name: Verify signature
-        run: |
-          codesign -dv --verbose=4 "Payload/ClassTeacherApp.app" 2>&1 | head -20
-          echo "--- embedded profile check ---"
-          ls "Payload/ClassTeacherApp.app/embedded.mobileprovision" && echo "OK: profile embedded"
-
-      - name: Upload signed IPA
+      - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ClassTeacherApp-signed-ipa
-          path: ClassTeacherApp-signed.ipa
+          name: ClassTeacherApp-unsigned-ipa
+          path: ClassTeacherApp-unsigned.ipa
