@@ -54,34 +54,80 @@ class DataManager {
     func loadTodos() -> [TodoItem]? { load("todos") }
     func saveTodos(_ v: [TodoItem]) { save(v, to: "todos") }
 
-    // MARK: - 数据管理
-    // 导出全部数据为 JSON（用于备份/迁移）
-    func exportAllData() -> Data? {
-        struct AllData: Codable {
-            let classInfo: ClassInfo
-            let students: [Student]
-            let exams: [Exam]
-            let scores: [ScoreRecord]
-            let courses: [Course]
-            let dutyGroups: [DutyGroup]
-            let todos: [TodoItem]
+    func loadNotifications() -> [NotificationItem]? { load("notifications") }
+    func saveNotifications(_ v: [NotificationItem]) { save(v, to: "notifications") }
+
+    func loadAlbumFolders() -> [AlbumFolder]? { load("albumFolders") }
+    func saveAlbumFolders(_ v: [AlbumFolder]) { save(v, to: "albumFolders") }
+
+    func loadAlbumPhotos() -> [AlbumPhoto]? { load("albumPhotos") }
+    func saveAlbumPhotos(_ v: [AlbumPhoto]) { save(v, to: "albumPhotos") }
+
+    // MARK: - 照片二进制（单独存文件，避免 JSON 过大）
+    private var photosDirectory: URL {
+        documentsURL.appendingPathComponent("Photos", isDirectory: true)
+    }
+
+    func savePhotoData(_ data: Data, id: UUID) {
+        let dir = photosDirectory
+        if !fileManager.fileExists(atPath: dir.path) {
+            try? fileManager.createDirectory(at: dir, withIntermediateDirectories: true)
         }
-        let data = AllData(
+        try? data.write(to: dir.appendingPathComponent(id.uuidString), options: .atomic)
+    }
+
+    func loadPhotoData(id: UUID) -> Data? {
+        try? Data(contentsOf: photosDirectory.appendingPathComponent(id.uuidString))
+    }
+
+    func deletePhotoData(id: UUID) {
+        try? fileManager.removeItem(at: photosDirectory.appendingPathComponent(id.uuidString))
+    }
+
+    private func deleteAllPhotoFiles() {
+        try? fileManager.removeItem(at: photosDirectory)
+    }
+
+    // MARK: - 数据管理
+    // 导出全部数据为 JSON（用于备份/迁移，包含照片二进制）
+    func exportAllData() -> Data? {
+        var photoFiles: [String: Data] = [:]
+        if let photos = loadAlbumPhotos() {
+            for photo in photos {
+                if let data = loadPhotoData(id: photo.id) {
+                    photoFiles[photo.id.uuidString] = data
+                }
+            }
+        }
+        let backup = AllDataBackup(
             classInfo: loadClassInfo() ?? .default,
             students: loadStudents() ?? [],
             exams: loadExams() ?? [],
-            scores: loadScores() ?? [],
+            scoreRecords: loadScores() ?? [],
             courses: loadCourses() ?? [],
             dutyGroups: loadDutyGroups() ?? [],
-            todos: loadTodos() ?? []
+            todos: loadTodos() ?? [],
+            notifications: loadNotifications() ?? [],
+            albumFolders: loadAlbumFolders() ?? [],
+            albumPhotos: loadAlbumPhotos() ?? [],
+            photoFiles: photoFiles
         )
-        return try? JSONEncoder().encode(data)
+        return try? JSONEncoder().encode(backup)
+    }
+
+    // 导入备份：写回照片文件
+    func importPhotoFiles(_ files: [String: Data]) {
+        for (id, data) in files {
+            guard let uuid = UUID(uuidString: id) else { continue }
+            savePhotoData(data, id: uuid)
+        }
     }
 
     // 清空全部数据
     func clearAllData() {
-        for name in ["classInfo", "students", "exams", "scores", "courses", "dutyGroups", "todos"] {
+        for name in ["classInfo", "students", "exams", "scores", "courses", "dutyGroups", "todos", "notifications", "albumFolders", "albumPhotos"] {
             try? fileManager.removeItem(at: fileURL(name))
         }
+        deleteAllPhotoFiles()
     }
 }

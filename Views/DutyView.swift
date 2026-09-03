@@ -116,6 +116,13 @@ struct DutyView: View {
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
+                    .contextMenu {
+                        Button(role: .destructive) {
+                            viewModel.deleteDutyGroup(group)
+                        } label: {
+                            Label("删除第\(group.groupNumber)组", systemImage: "trash")
+                        }
+                    }
                     if index < sortedGroups.count - 1 {
                         Divider().padding(.leading, 16)
                     }

@@ -21,6 +21,11 @@
 		B1000000000000000000000C /* SeatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000C /* SeatView.swift */; };
 		B1000000000000000000000D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000D /* SettingsView.swift */; };
 		B1000000000000000000000E /* StudentListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000E /* StudentListView.swift */; };
+		B10000000000000000000021 /* ExtraModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000021 /* ExtraModels.swift */; };
+		B10000000000000000000022 /* NotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000022 /* NotificationView.swift */; };
+		B10000000000000000000023 /* AlbumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000023 /* AlbumView.swift */; };
+		B10000000000000000000024 /* ClassMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000024 /* ClassMapView.swift */; };
+		B10000000000000000000025 /* RankingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000025 /* RankingListView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +43,11 @@
 		A1000000000000000000000C /* SeatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeatView.swift; sourceTree = "<group>"; };
 		A1000000000000000000000D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A1000000000000000000000E /* StudentListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentListView.swift; sourceTree = "<group>"; };
+		A10000000000000000000021 /* ExtraModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtraModels.swift; sourceTree = "<group>"; };
+		A10000000000000000000022 /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
+		A10000000000000000000023 /* AlbumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumView.swift; sourceTree = "<group>"; };
+		A10000000000000000000024 /* ClassMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassMapView.swift; sourceTree = "<group>"; };
+		A10000000000000000000025 /* RankingListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankingListView.swift; sourceTree = "<group>"; };
 		A1000000000000000000000F /* ClassTeacherApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ClassTeacherApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -85,6 +95,10 @@
 				A1000000000000000000000C /* SeatView.swift */,
 				A10000000000000000000009 /* RankingAndProfileView.swift */,
 				A1000000000000000000000D /* SettingsView.swift */,
+				A10000000000000000000022 /* NotificationView.swift */,
+				A10000000000000000000023 /* AlbumView.swift */,
+				A10000000000000000000024 /* ClassMapView.swift */,
+				A10000000000000000000025 /* RankingListView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -109,6 +123,7 @@
 			isa = PBXGroup;
 			children = (
 				A10000000000000000000003 /* Student.swift */,
+				A10000000000000000000021 /* ExtraModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -195,6 +210,11 @@
 				B1000000000000000000000C /* SeatView.swift in Sources */,
 				B1000000000000000000000D /* SettingsView.swift in Sources */,
 				B1000000000000000000000E /* StudentListView.swift in Sources */,
+				B10000000000000000000021 /* ExtraModels.swift in Sources */,
+				B10000000000000000000022 /* NotificationView.swift in Sources */,
+				B10000000000000000000023 /* AlbumView.swift in Sources */,
+				B10000000000000000000024 /* ClassMapView.swift in Sources */,
+				B10000000000000000000025 /* RankingListView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

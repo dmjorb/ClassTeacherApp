@@ -125,31 +125,27 @@ struct StatCard: View {
     }
 }
 
-// 系统风格的功能入口按钮
+// 功能入口按钮的标签（由 NavigationLink/Button 包裹使用）
 struct FeatureButton: View {
     let title: String
     let systemImage: String
     let color: Color
-    let action: () -> Void
-    
+
     var body: some View {
-        Button(action: action) {
-            VStack(spacing: AppTheme.Spacing.small) {
-                Image(systemName: systemImage)
-                    .font(.title2)
-                    .foregroundColor(color)
-                    .frame(width: 48, height: 48)
-                    .background(color.opacity(0.15))
-                    .cornerRadius(AppTheme.CornerRadius.medium)
-                Text(title)
-                    .font(AppTheme.Fonts.caption)
-                    .foregroundColor(AppTheme.Colors.primaryText)
-                    .multilineTextAlignment(.center)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, AppTheme.Spacing.small)
+        VStack(spacing: AppTheme.Spacing.small) {
+            Image(systemName: systemImage)
+                .font(.title2)
+                .foregroundColor(color)
+                .frame(width: 48, height: 48)
+                .background(color.opacity(0.15))
+                .cornerRadius(AppTheme.CornerRadius.medium)
+            Text(title)
+                .font(AppTheme.Fonts.caption)
+                .foregroundColor(AppTheme.Colors.primaryText)
+                .multilineTextAlignment(.center)
         }
-        .buttonStyle(.plain)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, AppTheme.Spacing.small)
     }
 }
 

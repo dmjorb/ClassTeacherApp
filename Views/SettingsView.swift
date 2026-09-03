@@ -3,6 +3,7 @@ import SwiftUI
 // 班级设置
 struct SettingsView: View {
     @EnvironmentObject var viewModel: AppViewModel
+    @Environment(\.dismiss) private var dismiss
     @State private var className = ""
     @State private var grade = ""
     @State private var headTeacher = ""
@@ -42,10 +43,11 @@ struct SettingsView: View {
                         headTeacher: headTeacher.trimmingCharacters(in: .whitespaces),
                         subjects: subjects
                     )
+                    dismiss()
                 }
                 .disabled(className.trimmingCharacters(in: .whitespaces).isEmpty)
             } footer: {
-                Text("科目将用于考试、课表等功能的选择。")
+                Text("科目将用于考试、课表等功能的选择。保存后立即生效并自动持久化。")
             }
         }
         .navigationTitle("班级设置")

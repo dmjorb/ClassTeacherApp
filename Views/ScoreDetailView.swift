@@ -64,6 +64,8 @@ struct ScoreDetailView: View {
                     }
                 }
                 .listStyle(.insetGrouped)
+                // 切换科目时强制重建输入行，避免显示上一个科目的分数
+                .id(selectedSubject)
             }
         }
         .navigationTitle(exam.name)
@@ -142,7 +144,12 @@ struct ScoreInputRow: View {
                 .onChange(of: text) { newValue in
                     let cleaned = newValue.filter { "0123456789.".contains($0) }
                     if cleaned != newValue { text = cleaned }
-                    saveIfValid(cleaned)
+                    if cleaned.isEmpty {
+                        // 清空输入框 = 删除该成绩
+                        viewModel.removeScore(studentId: student.id, examId: examId, subject: subject)
+                    } else {
+                        saveIfValid(cleaned)
+                    }
                 }
         }
     }

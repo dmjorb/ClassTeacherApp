@@ -127,11 +127,13 @@ struct CourseEditSheet: View {
                         TextField("任课老师", text: $teacher)
                     }
                     Section {
-                        Button("删除这节课", systemImage: "trash", role: .destructive) {
+                        Button(role: .destructive) {
                             if let course = existing {
                                 viewModel.deleteCourse(course)
                             }
                             dismiss()
+                        } label: {
+                            Label("删除这节课", systemImage: "trash")
                         }
                     }
                 } else {

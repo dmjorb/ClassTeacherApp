@@ -5,6 +5,7 @@ struct HomeView: View {
     @EnvironmentObject var viewModel: AppViewModel
     @State private var showingAddTodo = false
     @State private var newTodoTitle = ""
+    @State private var showingCompose = false
 
     private let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
 
@@ -24,6 +25,7 @@ struct HomeView: View {
                 header
                 statCards
                 functionGrid
+                nextDutySection
                 todayCoursesSection
                 todoSection
             }
@@ -42,6 +44,11 @@ struct HomeView: View {
                     viewModel.addTodo(title: title)
                 }
                 newTodoTitle = ""
+            }
+        }
+        .sheet(isPresented: $showingCompose) {
+            NavigationStack {
+                NotificationComposeView()
             }
         }
     }
@@ -81,7 +88,7 @@ struct HomeView: View {
         }
     }
 
-    // MARK: - 功能入口
+    // MARK: - 功能入口（全部为真实跳转/弹窗）
     private var functionGrid: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("功能")
@@ -90,32 +97,70 @@ struct HomeView: View {
 
             LazyVGrid(columns: columns, spacing: 12) {
                 NavigationLink { StudentListView() } label: {
-                    FeatureButton(title: "学生名册", systemImage: "person.2.fill", color: .blue) {}
+                    FeatureButton(title: "学生名册", systemImage: "person.2.fill", color: .blue)
                 }
                 .buttonStyle(.plain)
 
                 NavigationLink { ExamListView() } label: {
-                    FeatureButton(title: "成绩管理", systemImage: "chart.bar.fill", color: .orange) {}
-                }
-                .buttonStyle(.plain)
-
-                NavigationLink { ScheduleView() } label: {
-                    FeatureButton(title: "班级课表", systemImage: "calendar", color: .purple) {}
-                }
-                .buttonStyle(.plain)
-
-                NavigationLink { DutyView() } label: {
-                    FeatureButton(title: "值日表", systemImage: "broom.fill", color: .green) {}
+                    FeatureButton(title: "成绩管理", systemImage: "chart.bar.fill", color: .orange)
                 }
                 .buttonStyle(.plain)
 
                 NavigationLink { SeatView() } label: {
-                    FeatureButton(title: "座位表", systemImage: "square.grid.3x3.fill", color: .teal) {}
+                    FeatureButton(title: "座位表", systemImage: "square.grid.3x3.fill", color: .teal)
+                }
+                .buttonStyle(.plain)
+
+                NavigationLink { ScheduleView() } label: {
+                    FeatureButton(title: "班级课表", systemImage: "calendar", color: .purple)
+                }
+                .buttonStyle(.plain)
+
+                NavigationLink { DutyView() } label: {
+                    FeatureButton(title: "值日表", systemImage: "broom.fill", color: .green)
+                }
+                .buttonStyle(.plain)
+
+                Button {
+                    showingCompose = true
+                } label: {
+                    FeatureButton(title: "发通知", systemImage: "megaphone.fill", color: .red)
+                }
+                .buttonStyle(.plain)
+
+                NavigationLink { NotificationListView() } label: {
+                    ZStack(alignment: .topTrailing) {
+                        FeatureButton(title: "通知记录", systemImage: "bell.fill", color: .indigo)
+                        if viewModel.unreadNotificationCount > 0 {
+                            Text("\(viewModel.unreadNotificationCount)")
+                                .font(.caption2.weight(.bold))
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 5)
+                                .padding(.vertical, 1)
+                                .background(Capsule().fill(Color.red))
+                                .offset(x: -8, y: 4)
+                        }
+                    }
+                }
+                .buttonStyle(.plain)
+
+                NavigationLink { RankingListView() } label: {
+                    FeatureButton(title: "总分排名", systemImage: "list.number", color: .pink)
+                }
+                .buttonStyle(.plain)
+
+                NavigationLink { AlbumListView() } label: {
+                    FeatureButton(title: "班级相册", systemImage: "photo.on.rectangle.angled", color: .cyan)
+                }
+                .buttonStyle(.plain)
+
+                NavigationLink { ClassMapView() } label: {
+                    FeatureButton(title: "分布地图", systemImage: "map.fill", color: .brown)
                 }
                 .buttonStyle(.plain)
 
                 NavigationLink { SettingsView() } label: {
-                    FeatureButton(title: "班级设置", systemImage: "gearshape.fill", color: .gray) {}
+                    FeatureButton(title: "班级设置", systemImage: "gearshape.fill", color: .gray)
                 }
                 .buttonStyle(.plain)
             }
@@ -124,6 +169,46 @@ struct HomeView: View {
         .padding(.horizontal, 12)
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    // MARK: - 下次值日
+    @ViewBuilder
+    private var nextDutySection: some View {
+        if let duty = viewModel.currentDutyGroup {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Text("值日安排")
+                        .font(.headline)
+                    Spacer()
+                    Button("换下一组") {
+                        withAnimation { viewModel.nextDutyGroup() }
+                    }
+                    .font(.subheadline)
+                    .foregroundColor(.accentColor)
+                }
+                HStack(spacing: 14) {
+                    Text("\(duty.groupNumber)")
+                        .font(.title2.bold())
+                        .foregroundColor(.white)
+                        .frame(width: 52, height: 52)
+                        .background(Color.green)
+                        .clipShape(Circle())
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("第\(duty.groupNumber)值日组")
+                            .font(.body.weight(.semibold))
+                        Text(viewModel.dutyStudentNames(of: duty).isEmpty ? "未安排成员" : viewModel.dutyStudentNames(of: duty))
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                    }
+                    Spacer()
+                }
+                .padding(14)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color(.secondarySystemGroupedBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            }
+        }
     }
 
     // MARK: - 今日课程
@@ -145,6 +230,8 @@ struct HomeView: View {
                     .foregroundColor(.secondary)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 20)
+                    .background(Color(.secondarySystemGroupedBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             } else {
                 VStack(spacing: 0) {
                     ForEach(Array(todayCourses.enumerated()), id: \.element.id) { index, course in
@@ -203,6 +290,8 @@ struct HomeView: View {
                     .foregroundColor(.secondary)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 20)
+                    .background(Color(.secondarySystemGroupedBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             } else {
                 VStack(spacing: 0) {
                     ForEach(Array(pending.enumerated()), id: \.element.id) { index, todo in

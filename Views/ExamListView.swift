@@ -4,9 +4,15 @@ import SwiftUI
 struct ExamListView: View {
     @EnvironmentObject var viewModel: AppViewModel
     @State private var showingAdd = false
+    @State private var typeFilter: Exam.ExamType?
 
     private var sortedExams: [Exam] {
         viewModel.exams.sorted { $0.date > $1.date }
+    }
+
+    private var filteredExams: [Exam] {
+        guard let type = typeFilter else { return sortedExams }
+        return sortedExams.filter { $0.type == type }
     }
 
     var body: some View {
@@ -19,7 +25,17 @@ struct ExamListView: View {
                 )
             } else {
                 List {
-                    ForEach(sortedExams) { exam in
+                    Section {
+                        Picker("类型", selection: $typeFilter) {
+                            Text("全部").tag(Optional<Exam.ExamType>.none)
+                            ForEach(Exam.ExamType.allCases, id: \.self) { type in
+                                Text(type.rawValue).tag(Optional(type))
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .listRowBackground(Color.clear)
+                    }
+                    ForEach(filteredExams) { exam in
                         NavigationLink {
                             ScoreDetailView(exam: exam)
                         } label: {
@@ -49,7 +65,7 @@ struct ExamListView: View {
 
     private func deleteExams(at offsets: IndexSet) {
         for index in offsets {
-            viewModel.deleteExam(sortedExams[index])
+            viewModel.deleteExam(filteredExams[index])
         }
     }
 }
