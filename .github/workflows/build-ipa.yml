@@ -16,9 +16,10 @@ jobs:
         run: |
           mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
           echo "${{ secrets.IOS_MOBILEPROVISION_BASE64 }}" | base64 --decode > "$HOME/Library/MobileDevice/Provisioning Profiles/embedded.mobileprovision"
-          PROFILE_UUID=$(security cms -D -i "$HOME/Library/MobileDevice/Provisioning Profiles/embedded.mobileprovision" 2>/dev/null | /usr/libexec/PlistBuddy -c "Print :UUID" /dev/stdin 2>/dev/null || echo "embedded")
+          security cms -D -i "$HOME/Library/MobileDevice/Provisioning Profiles/embedded.mobileprovision" -o /tmp/profile.plist
+          PROFILE_UUID=$(/usr/libexec/PlistBuddy -c "Print :UUID" /tmp/profile.plist)
+          echo "Profile UUID=${PROFILE_UUID}"
           cp "$HOME/Library/MobileDevice/Provisioning Profiles/embedded.mobileprovision" "$HOME/Library/MobileDevice/Provisioning Profiles/${PROFILE_UUID}.mobileprovision"
-          echo "Profile installed, UUID=${PROFILE_UUID}"
 
       - name: Import signing certificate
         run: |

@@ -16,3 +16,6 @@ DerivedData/
 
 # macOS
 .DS_Store
+
+# 签名证书（不入库）
+/班主任工作台签名证书/
