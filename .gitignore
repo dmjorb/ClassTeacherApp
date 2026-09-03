@@ -19,3 +19,6 @@ DerivedData/
 
 # 签名证书（不入库）
 /班主任工作台签名证书/
+
+# 临时文件
+/dist/upload_check.png
