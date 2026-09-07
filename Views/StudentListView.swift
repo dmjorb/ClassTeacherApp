@@ -583,7 +583,7 @@ struct StudentFormView: View {
             viewModel.addStudent(Student(
                 name: trimmed, studentNumber: studentNumber, gender: gender,
                 phone: phone, parentPhone: parentPhone, address: address,
-                groupNumber: groupNumber, dormitory: dormitory, notes: notes, seatRow: seatRow, seatCol: seatCol
+                groupNumber: groupNumber, seatRow: seatRow, seatCol: seatCol, dormitory: dormitory, notes: notes
             ))
         case .edit(let student):
             var updated = student
