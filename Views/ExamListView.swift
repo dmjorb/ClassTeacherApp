@@ -521,7 +521,7 @@ struct ScoreCSVImportView: View {
                                                 Text(exam.name)
                                                     .font(AppTheme.Fonts.body.weight(.medium))
                                                     .foregroundColor(AppTheme.Colors.primaryText)
-                                                Text("\(exam.type.rawValue) · \(exam.subjects.count) 科")
+                                                Text(examSubtitle(for: exam))
                                                     .font(AppTheme.Fonts.caption2)
                                                     .foregroundColor(AppTheme.Colors.tertiaryText)
                                             }
@@ -641,6 +641,10 @@ struct ScoreCSVImportView: View {
                 break
             }
         }
+    }
+
+    private func examSubtitle(for exam: Exam) -> String {
+        "\(exam.type.rawValue) · \(exam.subjects.count) 科"
     }
 
     private func csvPreviewCell(row: [String], idx: Int) -> some View {
