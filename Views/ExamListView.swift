@@ -597,7 +597,13 @@ struct ScoreCSVImportView: View {
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
-                    .background(selectedExamId != nil ? AppTheme.Colors.accentGradient : Color.gray.opacity(0.3))
+                    .background {
+                        if selectedExamId != nil {
+                            AppTheme.Colors.accentGradient
+                        } else {
+                            Color.gray.opacity(0.3)
+                        }
+                    }
                     .clipShape(RoundedRectangle(cornerRadius: AppTheme.CornerRadius.button, style: .continuous))
                 }
                 .buttonStyle(.plain)
