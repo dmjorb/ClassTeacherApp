@@ -59,7 +59,7 @@ struct DutyView: View {
 
     private func printDuty() {
         let groups = sortedGroups.map { group -> (name: String, members: [String]) in
-            let members = group.memberIds.compactMap { id in
+            let members = group.studentIds.compactMap { id in
                 viewModel.students.first(where: { $0.id == id })?.name
             }
             return ("第\(group.groupNumber)组", members)

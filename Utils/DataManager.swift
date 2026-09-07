@@ -105,17 +105,27 @@ class DataManager {
                 }
             }
         }
+        let classInfo = loadClassInfo() ?? .default
+        let students = loadStudents() ?? []
+        let exams = loadExams() ?? []
+        let scoreRecords = loadScores() ?? []
+        let courses = loadCourses() ?? []
+        let dutyGroups = loadDutyGroups() ?? []
+        let todos = loadTodos() ?? []
+        let notifications = loadNotifications() ?? []
+        let albumFolders = loadAlbumFolders() ?? []
+        let albumPhotos = loadAlbumPhotos() ?? []
         let backup = AllDataBackup(
-            classInfo: loadClassInfo() ?? .default,
-            students: loadStudents() ?? [],
-            exams: loadExams() ?? [],
-            scoreRecords: loadScores() ?? [],
-            courses: loadCourses() ?? [],
-            dutyGroups: loadDutyGroups() ?? [],
-            todos: loadTodos() ?? [],
-            notifications: loadNotifications() ?? [],
-            albumFolders: loadAlbumFolders() ?? [],
-            albumPhotos: loadAlbumPhotos() ?? [],
+            classInfo: classInfo,
+            students: students,
+            exams: exams,
+            scoreRecords: scoreRecords,
+            courses: courses,
+            dutyGroups: dutyGroups,
+            todos: todos,
+            notifications: notifications,
+            albumFolders: albumFolders,
+            albumPhotos: albumPhotos,
             photoFiles: photoFiles
         )
         return try? JSONEncoder().encode(backup)

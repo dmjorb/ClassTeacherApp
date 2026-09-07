@@ -144,7 +144,7 @@ struct ExamListView: View {
             // 统计
             HStack(spacing: 16) {
                 statMini(value: "\(filteredExams.count)", label: "考试")
-                statMini(value: "\(viewModel.scoreRecords.filter { filteredExams.contains(where: { $0.id == $0.examId }) }.count)", label: "成绩")
+                statMini(value: "\(viewModel.scoreRecords.filter { record in filteredExams.contains(where: { exam in exam.id == record.examId }) }.count)", label: "成绩")
             }
         }
         .padding(.top, 12)
@@ -583,7 +583,8 @@ struct ScoreCSVImportView: View {
                                 ForEach(Array(parsedRows.prefix(3).enumerated()), id: \.offset) { _, row in
                                     HStack(spacing: 0) {
                                         ForEach(0..<min(row.count, headers.count), id: \.self) { idx in
-                                            Text(row.indices.contains(idx) ? row[idx] : "")
+                                            let cellText = row.indices.contains(idx) ? row[idx] : ""
+                                            Text(cellText)
                                                 .font(.system(size: 10))
                                                 .foregroundColor(AppTheme.Colors.primaryText)
                                                 .frame(maxWidth: .infinity)
@@ -651,12 +652,13 @@ struct ScoreCSVImportView: View {
         let accessing = url.startAccessingSecurityScopedResource()
         defer { if accessing { url.stopAccessingSecurityScopedResource() } }
 
+        let gbkEncoding = String.Encoding(rawValue: CFStringConvertEncodingToNSStringEncoding(CFStringEncoding(CFStringEncodings.GB_18030_2000.rawValue)))
         guard let data = try? Data(contentsOf: url),
-              let content = String(data: data, encoding: .utf8) ?? String(data: data, encoding: .gbk) else { return }
+              let content = String(data: data, encoding: .utf8) ?? String(data: data, encoding: gbkEncoding) else { return }
 
         fileName = url.lastPathComponent
 
-        let lines = content.components(separatedBy: .newlines).filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+        let lines = content.components(separatedBy: CharacterSet.newlines).filter { !$0.trimmingCharacters(in: CharacterSet.whitespaces).isEmpty }
         guard !lines.isEmpty else { return }
 
         // 解析表头

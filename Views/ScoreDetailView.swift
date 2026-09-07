@@ -494,7 +494,7 @@ struct RankingView: View {
     private func podiumColor(index: Int) -> Color {
         switch index {
         case 0: return Color(red: 0.95, green: 0.75, blue: 0.15)  // 金
-        case 1: return Color(red: 0.65, gray: 0.65, blue: 0.67)   // 银
+        case 1: return Color(red: 0.65, green: 0.65, blue: 0.67)   // 银
         case 2: return Color(red: 0.80, green: 0.50, blue: 0.20)  // 铜
         default: return .gray
         }
