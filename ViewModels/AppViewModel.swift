@@ -7,6 +7,8 @@ class AppViewModel: ObservableObject {
     // MARK: - 数据
     @Published var classInfo: ClassInfo
     @Published var students: [Student]
+    @Published var semesters: [Semester]
+    @Published var currentSemesterId: UUID?
     @Published var exams: [Exam]
     @Published var scoreRecords: [ScoreRecord]
     @Published var courses: [Course]
@@ -15,6 +17,35 @@ class AppViewModel: ObservableObject {
     @Published var notifications: [NotificationItem]
     @Published var albumFolders: [AlbumFolder]
     @Published var albumPhotos: [AlbumPhoto]
+    @Published var notificationTemplates: [NotificationTemplate]
+
+    // 首页功能入口配置
+    struct HomeFeature: Identifiable, Codable {
+        let id: String
+        let name: String
+        let systemImage: String
+        var isVisible: Bool
+        var order: Int
+    }
+
+    @Published var homeFeatures: [HomeFeature] {
+        didSet { saveHomeFeatures() }
+    }
+
+    // 默认功能列表
+    static let defaultHomeFeatures: [HomeFeature] = [
+        HomeFeature(id: "schedule", name: "课表", systemImage: "calendar", isVisible: true, order: 0),
+        HomeFeature(id: "duty", name: "值日", systemImage: "broom", isVisible: true, order: 1),
+        HomeFeature(id: "seat", name: "座位", systemImage: "rectangle.grid.3x3", isVisible: true, order: 2),
+        HomeFeature(id: "map", name: "班级地图", systemImage: "map", isVisible: true, order: 3),
+        HomeFeature(id: "album", name: "相册", systemImage: "photo.on.rectangle", isVisible: true, order: 4),
+        HomeFeature(id: "notification", name: "发通知", systemImage: "megaphone", isVisible: true, order: 5),
+        HomeFeature(id: "ranking", name: "成绩排名", systemImage: "list.number", isVisible: true, order: 6),
+        HomeFeature(id: "scoreImport", name: "导入成绩", systemImage: "square.and.arrow.down", isVisible: true, order: 7),
+        HomeFeature(id: "templates", name: "通知模板", systemImage: "doc.text", isVisible: false, order: 8),
+        HomeFeature(id: "settings", name: "设置", systemImage: "gearshape", isVisible: false, order: 9),
+        HomeFeature(id: "print", name: "打印中心", systemImage: "printer", isVisible: false, order: 10)
+    ]
 
     @Published var currentDutyIndex: Int {
         didSet { UserDefaults.standard.set(currentDutyIndex, forKey: "currentDutyIndex") }
@@ -27,6 +58,8 @@ class AppViewModel: ObservableObject {
         if DataManager.shared.hasSavedData {
             self.classInfo = DataManager.shared.loadClassInfo() ?? .default
             self.students = DataManager.shared.loadStudents() ?? []
+            self.semesters = DataManager.shared.loadSemesters() ?? []
+            self.currentSemesterId = UserDefaults.standard.string(forKey: "currentSemesterId").flatMap(UUID.init(uuidString:))
             self.exams = DataManager.shared.loadExams() ?? []
             self.scoreRecords = DataManager.shared.loadScores() ?? []
             self.courses = DataManager.shared.loadCourses() ?? []
@@ -38,6 +71,8 @@ class AppViewModel: ObservableObject {
         } else {
             self.classInfo = .default
             self.students = []
+            self.semesters = []
+            self.currentSemesterId = nil
             self.exams = []
             self.scoreRecords = []
             self.courses = []
@@ -48,7 +83,64 @@ class AppViewModel: ObservableObject {
             self.albumPhotos = []
         }
         self.currentDutyIndex = UserDefaults.standard.integer(forKey: "currentDutyIndex")
+        self.notificationTemplates = NotificationTemplate.builtinTemplates + (DataManager.shared.loadNotificationTemplates() ?? [])
+        self.homeFeatures = AppViewModel.loadHomeFeatures()
         setupAutoSave()
+        setupThemeObserver()
+    }
+
+    // MARK: - 首页功能配置
+    private static func loadHomeFeatures() -> [HomeFeature] {
+        guard let data = UserDefaults.standard.data(forKey: "homeFeatures"),
+              let features = try? JSONDecoder().decode([HomeFeature].self, from: data) else {
+            return defaultHomeFeatures
+        }
+        // 合并：用户配置 + 默认新增的功能
+        var merged = features
+        for defaultFeature in defaultHomeFeatures {
+            if !merged.contains(where: { $0.id == defaultFeature.id }) {
+                merged.append(defaultFeature)
+            }
+        }
+        return merged.sorted { $0.order < $1.order }
+    }
+
+    private func saveHomeFeatures() {
+        if let data = try? JSONEncoder().encode(homeFeatures) {
+            UserDefaults.standard.set(data, forKey: "homeFeatures")
+        }
+    }
+
+    var visibleHomeFeatures: [HomeFeature] {
+        homeFeatures.filter { $0.isVisible }.sorted { $0.order < $1.order }
+    }
+
+    func toggleFeature(_ feature: HomeFeature) {
+        if let i = homeFeatures.firstIndex(where: { $0.id == feature.id }) {
+            homeFeatures[i].isVisible.toggle()
+        }
+    }
+
+    func moveFeature(from source: IndexSet, to destination: Int) {
+        var visible = visibleHomeFeatures
+        visible.move(fromOffsets: source, toOffset: destination)
+        // 更新 order
+        for (idx, feature) in visible.enumerated() {
+            if let i = homeFeatures.firstIndex(where: { $0.id == feature.id }) {
+                homeFeatures[i].order = idx
+            }
+        }
+    }
+
+    func resetHomeFeatures() {
+        homeFeatures = AppViewModel.defaultHomeFeatures
+    }
+
+    // 监听主题变化，触发全局 UI 刷新
+    private func setupThemeObserver() {
+        NotificationCenter.default.addObserver(forName: NSNotification.Name("ThemeChanged"), object: nil, queue: .main) { [weak self] _ in
+            self?.objectWillChange.send()
+        }
     }
 
     // MARK: - 自动保存
@@ -57,6 +149,10 @@ class AppViewModel: ObservableObject {
             .sink { [weak self] in self?.dataManager.saveClassInfo($0) }.store(in: &cancellables)
         $students.dropFirst().debounce(for: .seconds(0.5), scheduler: DispatchQueue.main)
             .sink { [weak self] in self?.dataManager.saveStudents($0) }.store(in: &cancellables)
+        $semesters.dropFirst().debounce(for: .seconds(0.5), scheduler: DispatchQueue.main)
+            .sink { [weak self] in self?.dataManager.saveSemesters($0) }.store(in: &cancellables)
+        $currentSemesterId.dropFirst().debounce(for: .seconds(0.3), scheduler: DispatchQueue.main)
+            .sink { [weak self] in UserDefaults.standard.set($0?.uuidString, forKey: "currentSemesterId") }.store(in: &cancellables)
         $exams.dropFirst().debounce(for: .seconds(0.5), scheduler: DispatchQueue.main)
             .sink { [weak self] in self?.dataManager.saveExams($0) }.store(in: &cancellables)
         $scoreRecords.dropFirst().debounce(for: .seconds(0.5), scheduler: DispatchQueue.main)
@@ -95,9 +191,58 @@ class AppViewModel: ObservableObject {
     func studentName(for id: UUID) -> String { students.first { $0.id == id }?.name ?? "未知" }
     func student(id: UUID) -> Student? { students.first { $0.id == id } }
 
+    // MARK: - 学期
+    var currentSemester: Semester? {
+        guard let id = currentSemesterId else { return semesters.first }
+        return semesters.first { $0.id == id } ?? semesters.first
+    }
+    func addSemester(_ semester: Semester) {
+        semesters.append(semester)
+        if currentSemesterId == nil { currentSemesterId = semester.id }
+    }
+    func updateSemester(_ semester: Semester) {
+        if let i = semesters.firstIndex(where: { $0.id == semester.id }) { semesters[i] = semester }
+    }
+    func deleteSemester(_ semester: Semester) {
+        semesters.removeAll { $0.id == semester.id }
+        // 解除该学期下考试的关联
+        for i in exams.indices where exams[i].semesterId == semester.id {
+            exams[i].semesterId = nil
+        }
+        if currentSemesterId == semester.id { currentSemesterId = semesters.first?.id }
+    }
+    func setCurrentSemester(_ semester: Semester) {
+        currentSemesterId = semester.id
+    }
+
     // MARK: - 考试
-    func addExam(name: String, type: Exam.ExamType, subjects: [String]) {
-        exams.append(Exam(name: name, type: type, subjects: subjects))
+    func addExam(name: String, type: Exam.ExamType, subjects: [String], semesterId: UUID? = nil) {
+        exams.append(Exam(name: name, type: type, subjects: subjects, semesterId: semesterId ?? currentSemesterId))
+    }
+
+    // 批量导入成绩（CSV 解析后调用）
+    // 返回 (成功导入条数, 失败条数, 未找到学生列表)
+    @discardableResult
+    func importScores(examId: UUID, records: [(studentNumber: String, subject: String, score: Double)]) -> (success: Int, failed: Int, notFound: [String]) {
+        var success = 0
+        var failed = 0
+        var notFound: Set<String> = []
+
+        for record in records {
+            guard let student = students.first(where: { $0.studentNumber == record.studentNumber }) else {
+                notFound.insert(record.studentNumber)
+                failed += 1
+                continue
+            }
+            guard record.score >= 0 && record.score <= 1000 else {
+                failed += 1
+                continue
+            }
+            setScore(studentId: student.id, examId: examId, subject: record.subject, score: record.score)
+            success += 1
+        }
+
+        return (success, failed, Array(notFound))
     }
     func deleteExam(_ exam: Exam) {
         exams.removeAll { $0.id == exam.id }
@@ -209,6 +354,28 @@ class AppViewModel: ObservableObject {
     }
     var unreadNotificationCount: Int { notifications.filter { !$0.isRead }.count }
 
+    // MARK: - 通知模板
+    var customTemplates: [NotificationTemplate] {
+        notificationTemplates.filter { !$0.isBuiltin }
+    }
+    func addTemplate(_ template: NotificationTemplate) {
+        notificationTemplates.append(template)
+        saveCustomTemplates()
+    }
+    func updateTemplate(_ template: NotificationTemplate) {
+        if let i = notificationTemplates.firstIndex(where: { $0.id == template.id }) {
+            notificationTemplates[i] = template
+            saveCustomTemplates()
+        }
+    }
+    func deleteTemplate(_ template: NotificationTemplate) {
+        notificationTemplates.removeAll { $0.id == template.id }
+        saveCustomTemplates()
+    }
+    private func saveCustomTemplates() {
+        dataManager.saveNotificationTemplates(customTemplates)
+    }
+
     // MARK: - 相册
     @discardableResult
     func addAlbum(name: String, category: String) -> AlbumFolder {
@@ -261,6 +428,7 @@ class AppViewModel: ObservableObject {
         let backup = AllDataBackup(
             classInfo: classInfo,
             students: students,
+            semesters: semesters,
             exams: exams,
             scoreRecords: scoreRecords,
             courses: courses,
@@ -282,6 +450,8 @@ class AppViewModel: ObservableObject {
         dataManager.importPhotoFiles(backup.photoFiles)
         classInfo = backup.classInfo
         students = backup.students
+        semesters = backup.semesters
+        currentSemesterId = backup.semesters.first?.id
         exams = backup.exams
         scoreRecords = backup.scoreRecords
         courses = backup.courses
@@ -334,14 +504,32 @@ class AppViewModel: ObservableObject {
         }
         students = newStudents
 
+        // 学期示例数据
         let calendar = Calendar.current
+        let semester1 = Semester(
+            name: "2024-2025学年第一学期",
+            shortName: "第1学期",
+            startDate: calendar.date(from: DateComponents(year: 2024, month: 9, day: 1)) ?? Date(),
+            endDate: calendar.date(from: DateComponents(year: 2025, month: 1, day: 31)) ?? Date(),
+            isCurrent: true
+        )
+        let semester2 = Semester(
+            name: "2024-2025学年第二学期",
+            shortName: "第2学期",
+            startDate: calendar.date(from: DateComponents(year: 2025, month: 2, day: 1)) ?? Date(),
+            endDate: calendar.date(from: DateComponents(year: 2025, month: 7, day: 31)) ?? Date(),
+            isCurrent: false
+        )
+        semesters = [semester1, semester2]
+        currentSemesterId = semester1.id
+
         let examSubjects = ["语文", "数学", "英语"]
         let monthly = Exam(name: "9月月考", type: .monthly,
                            date: calendar.date(byAdding: .day, value: -20, to: Date()) ?? Date(),
-                           subjects: examSubjects)
+                           subjects: examSubjects, semesterId: semester1.id)
         let midterm = Exam(name: "期中考试", type: .midterm,
                            date: calendar.date(byAdding: .day, value: -5, to: Date()) ?? Date(),
-                           subjects: examSubjects)
+                           subjects: examSubjects, semesterId: semester1.id)
         exams = [monthly, midterm]
 
         // 稳定的伪随机成绩（55-95），不依赖随机数种子
@@ -400,6 +588,8 @@ class AppViewModel: ObservableObject {
         dataManager.clearAllData()
         classInfo = .default
         students = []
+        semesters = []
+        currentSemesterId = nil
         exams = []
         scoreRecords = []
         courses = []

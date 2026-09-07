@@ -1,4 +1,4 @@
-import SwiftUI
+﻿import SwiftUI
 import PhotosUI
 import UIKit
 
@@ -47,7 +47,7 @@ struct AlbumListView: View {
                     }
                     .padding()
                 }
-                .background(Color(.systemGroupedBackground))
+                .background(AppTheme.Colors.background)
             }
         }
         .navigationTitle("班级相册")
@@ -126,7 +126,7 @@ struct AlbumCard: View {
             .padding(.horizontal, 4)
             .padding(.bottom, 4)
         }
-        .background(Color(.secondarySystemGroupedBackground))
+        .background(AppTheme.Colors.cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
@@ -174,7 +174,7 @@ struct AlbumDetailView: View {
                             }
                             .padding()
                         }
-                        .background(Color(.systemGroupedBackground))
+                        .background(AppTheme.Colors.background)
                     }
                 }
                 .navigationTitle(folder.name)
@@ -239,7 +239,7 @@ struct PhotoThumbView: View {
                     .scaledToFill()
             } else {
                 Rectangle()
-                    .fill(Color(.tertiarySystemGroupedBackground))
+                    .fill(AppTheme.Colors.subtleBackground)
                     .overlay(ProgressView())
             }
         }

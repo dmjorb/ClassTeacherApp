@@ -1,5 +1,25 @@
 import Foundation
 
+// MARK: - 学期
+struct Semester: Identifiable, Codable {
+    let id: UUID
+    var name: String              // 如"2024-2025学年第一学期"
+    var shortName: String         // 如"第1学期"
+    var startDate: Date
+    var endDate: Date
+    var isCurrent: Bool
+
+    init(id: UUID = UUID(), name: String, shortName: String = "",
+         startDate: Date = Date(), endDate: Date = Date(), isCurrent: Bool = false) {
+        self.id = id
+        self.name = name
+        self.shortName = shortName.isEmpty ? name : shortName
+        self.startDate = startDate
+        self.endDate = endDate
+        self.isCurrent = isCurrent
+    }
+}
+
 // MARK: - 通知
 struct NotificationItem: Identifiable, Codable {
     let id: UUID
@@ -59,10 +79,68 @@ struct AlbumPhoto: Identifiable, Codable {
     }
 }
 
+// MARK: - 通知模板
+struct NotificationTemplate: Identifiable, Codable {
+    let id: UUID
+    var title: String
+    var content: String
+    var audience: String
+    var isBuiltin: Bool
+
+    init(id: UUID = UUID(), title: String, content: String, audience: String = "全班", isBuiltin: Bool = false) {
+        self.id = id
+        self.title = title
+        self.content = content
+        self.audience = audience
+        self.isBuiltin = isBuiltin
+    }
+
+    // 预设模板
+    static let builtinTemplates: [NotificationTemplate] = [
+        NotificationTemplate(
+            title: "考试通知",
+            content: "各位同学/家长：\n定于本周五进行本学期第一次月考，考试科目为语文、数学、英语。请同学们认真复习，家长协助督促。考试时间：上午8:00-12:00，下午14:00-16:00。\n谢谢配合！",
+            audience: "全班",
+            isBuiltin: true
+        ),
+        NotificationTemplate(
+            title: "家长会通知",
+            content: "尊敬的各位家长：\n兹定于本周五下午4:00在本班教室召开家长会，主要内容包括：本学期教学安排、学生在校表现反馈、家校沟通事项。请各位家长准时参加，如有特殊情况请提前与班主任联系。\n谢谢！",
+            audience: "家长",
+            isBuiltin: true
+        ),
+        NotificationTemplate(
+            title: "放假通知",
+            content: "各位同学/家长：\n根据学校安排，本周六、周日正常休息。请同学们合理安排作息，注意安全，按时完成作业。下周一早上7:30准时到校。\n祝大家周末愉快！",
+            audience: "全班",
+            isBuiltin: true
+        ),
+        NotificationTemplate(
+            title: "成绩反馈",
+            content: "各位家长：\n本次考试成绩已公布，整体情况良好。请各位家长查看孩子成绩单，与孩子一起分析错题，制定改进计划。如有疑问可随时与我沟通。\n感谢您的支持与配合！",
+            audience: "家长",
+            isBuiltin: true
+        ),
+        NotificationTemplate(
+            title: "活动通知",
+            content: "各位同学：\n本班将于下周三下午组织班级活动，地点待定。请同学们准时参加，穿校服，带好水杯。活动结束后正常放学。\n期待大家的参与！",
+            audience: "全班",
+            isBuiltin: true
+        ),
+        NotificationTemplate(
+            title: "班干部通知",
+            content: "各位班干部：\n请于今天下午放学后在教室召开简短会议，布置近期工作。请各位准时参加，带好笔记本。\n谢谢配合！",
+            audience: "班干部",
+            isBuiltin: true
+        )
+    ]
+}
+
 // MARK: - 全量备份（导出/导入用）
 struct AllDataBackup: Codable {
     var classInfo: ClassInfo
     var students: [Student]
+    var semesters: [Semester]
     var exams: [Exam]
     var scoreRecords: [ScoreRecord]
     var courses: [Course]

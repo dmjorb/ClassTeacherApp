@@ -1,0 +1,27 @@
+{
+  "query": "iOS 高级 UI 排版 不要老旧的排版",
+  "signature": {
+    "ground": "light",
+    "typeVoice": "sans-cool",
+    "imageWorld": "graphic-abstract",
+    "layoutLogic": "axial",
+    "colorStrategy": "mono-neutral",
+    "motionVoice": "slow-push"
+  },
+  "why": {
+    "ground": "你指定的",
+    "typeVoice": "你指定的",
+    "imageWorld": "你指定的",
+    "layoutLogic": "你指定的",
+    "colorStrategy": "语义命中 1 个线索",
+    "motionVoice": "你指定的"
+  },
+  "open": [],
+  "divergence": {
+    "vsRecent": [
+      0
+    ],
+    "min": 0,
+    "require": 3
+  }
+}

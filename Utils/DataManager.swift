@@ -39,6 +39,9 @@ class DataManager {
     func loadStudents() -> [Student]? { load("students") }
     func saveStudents(_ v: [Student]) { save(v, to: "students") }
 
+    func loadSemesters() -> [Semester]? { load("semesters") }
+    func saveSemesters(_ v: [Semester]) { save(v, to: "semesters") }
+
     func loadExams() -> [Exam]? { load("exams") }
     func saveExams(_ v: [Exam]) { save(v, to: "exams") }
 
@@ -56,6 +59,9 @@ class DataManager {
 
     func loadNotifications() -> [NotificationItem]? { load("notifications") }
     func saveNotifications(_ v: [NotificationItem]) { save(v, to: "notifications") }
+
+    func loadNotificationTemplates() -> [NotificationTemplate]? { load("notificationTemplates") }
+    func saveNotificationTemplates(_ v: [NotificationTemplate]) { save(v, to: "notificationTemplates") }
 
     func loadAlbumFolders() -> [AlbumFolder]? { load("albumFolders") }
     func saveAlbumFolders(_ v: [AlbumFolder]) { save(v, to: "albumFolders") }

@@ -61,6 +61,7 @@ struct Exam: Identifiable, Codable {
     var type: ExamType
     var date: Date
     var subjects: [String]        // 考试科目
+    var semesterId: UUID?         // 关联学期
 
     enum ExamType: String, Codable, CaseIterable {
         case unitTest = "单元测"
@@ -69,12 +70,14 @@ struct Exam: Identifiable, Codable {
         case final = "期末考"
     }
 
-    init(id: UUID = UUID(), name: String, type: ExamType, date: Date = Date(), subjects: [String] = []) {
+    init(id: UUID = UUID(), name: String, type: ExamType, date: Date = Date(),
+         subjects: [String] = [], semesterId: UUID? = nil) {
         self.id = id
         self.name = name
         self.type = type
         self.date = date
         self.subjects = subjects
+        self.semesterId = semesterId
     }
 }
 

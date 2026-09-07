@@ -1,4 +1,4 @@
-import SwiftUI
+﻿import SwiftUI
 
 // 班级课表（周视图）
 struct ScheduleView: View {
@@ -39,11 +39,43 @@ struct ScheduleView: View {
             }
             .padding()
         }
-        .background(Color(.systemGroupedBackground))
+        .background(AppTheme.Colors.background)
         .navigationTitle("班级课表")
-        .sheet(item: $selectedSlot) { slot in
-            CourseEditSheet(weekday: slot.weekday, period: slot.period)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    printSchedule()
+                } label: {
+                    Image(systemName: "printer")
+                }
+            }
         }
+        .sheet(item: $selectedSlot) {
+            CourseEditSheet(weekday: $0.weekday, period: $0.period)
+        }
+    }
+
+    private func printSchedule() {
+        let weekdays = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
+        let periods = Array(1...8)
+        var schedule: [[String?]] = []
+
+        for period in periods {
+            var row: [String?] = []
+            for weekday in 1...7 {
+                let course = viewModel.courses(for: weekday).first { $0.period == period }
+                row.append(course?.subject)
+            }
+            schedule.append(row)
+        }
+
+        PrintService.shared.printSchedule(
+            className: viewModel.classInfo.className,
+            weekDays: weekdays,
+            periods: periods,
+            schedule: schedule
+        )
     }
 
     @ViewBuilder
@@ -72,7 +104,7 @@ struct ScheduleView: View {
                     .overlay(RoundedRectangle(cornerRadius: 6, style: .continuous).stroke(courseColor(course.subject), lineWidth: 1))
                 } else {
                     Rectangle()
-                        .fill(Color(.secondarySystemGroupedBackground))
+                        .fill(AppTheme.Colors.cardBackground)
                         .frame(width: colWidth, height: 52)
                         .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
                 }

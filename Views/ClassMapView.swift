@@ -1,4 +1,4 @@
-import SwiftUI
+﻿import SwiftUI
 import MapKit
 import CoreLocation
 
@@ -91,7 +91,7 @@ struct ClassMapView: View {
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
-        .background(Color(.secondarySystemGroupedBackground))
+        .background(AppTheme.Colors.cardBackground)
     }
 
     private var addressList: some View {

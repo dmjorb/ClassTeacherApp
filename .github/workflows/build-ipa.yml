@@ -7,20 +7,31 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Select Xcode
+        run: sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
       - name: Build app (unsigned)
         run: |
-          xcodebuild -project ClassTeacherApp.xcodeproj \
+          xcodebuild \
+            -project ClassTeacherApp.xcodeproj \
             -scheme ClassTeacherApp \
             -configuration Release \
-            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
-            build
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            DEVELOPMENT_TEAM="" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            build 2>&1 | tee build.log
 
       - name: Package IPA
         run: |
@@ -33,3 +44,10 @@ jobs:
         with:
           name: ClassTeacherApp-unsigned-ipa
           path: ClassTeacherApp-unsigned.ipa
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log

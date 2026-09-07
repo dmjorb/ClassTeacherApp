@@ -1,4 +1,4 @@
-import SwiftUI
+﻿import SwiftUI
 
 // 座位表（网格排座）
 struct SeatView: View {
@@ -36,7 +36,7 @@ struct SeatView: View {
             }
             .padding()
         }
-        .background(Color(.systemGroupedBackground))
+        .background(AppTheme.Colors.background)
         .navigationTitle("座位表")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -91,7 +91,7 @@ struct SeatView: View {
                     .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).stroke(Color.accentColor.opacity(0.4), lineWidth: 1))
                 } else {
                     Rectangle()
-                        .fill(Color(.secondarySystemGroupedBackground))
+                        .fill(AppTheme.Colors.cardBackground)
                         .frame(maxWidth: .infinity)
                         .frame(height: 54)
                         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))

@@ -1,0 +1,50 @@
+[
+  {
+    "where": "首页特稿区",
+    "selector": ".featured",
+    "what": "满版氛围图 + 渐变暗场 + 衬线大标题叠加，编辑体排版到位，标题与图互锁",
+    "measure": {"titleSize": "25px", "imgHeight": "340px", "radius": "20px"},
+    "fix": "无需修改，特稿作为首屏主角占比充足",
+    "resolved": true
+  },
+  {
+    "where": "今日推荐编号列表",
+    "selector": ".article-list",
+    "what": "非对称排版：第一条大图+大标题，其余紧凑编号+缩略图，打破均匀卡片墙",
+    "measure": {"largeTitle": "21px", "compactTitle": "16.5px", "idxSize": "22px"},
+    "fix": "无需修改，编号与字号层级清晰",
+    "resolved": true
+  },
+  {
+    "where": "引用块",
+    "selector": ".pullquote",
+    "what": "衬线斜体引号 + 大字号引文 + 出处，无卡片包裹，纯排版元素",
+    "measure": {"quoteSize": "21px", "lineHeight": "1.55", "accentLine": "32px"},
+    "fix": "无需修改，引用块是节奏换气点",
+    "resolved": true
+  },
+  {
+    "where": "本周热议深色段",
+    "selector": ".world-section",
+    "what": "深暖棕底色域切换，白字+编号列表，与亮场形成对比节奏",
+    "measure": {"bg": "#2A2520", "textColor": "#EDEAE4"},
+    "fix": "无需修改，色域切换制造阅读节奏",
+    "resolved": true
+  },
+  {
+    "where": "文章详情弹层",
+    "selector": ".article-modal",
+    "what": "大图+衬线大标题+作者信息+三按钮操作栏+首字下沉正文，底部弹层动效流畅",
+    "measure": {"titleSize": "27px", "dropCap": "48px", "radius": "28px"},
+    "fix": "无需修改，详情页信息层级完整",
+    "resolved": true
+  },
+  {
+    "where": "底部 tab 栏",
+    "selector": ".tabbar",
+    "what": "毛玻璃背景+自定义SVG图标+选中态顶部橙色指示条，非系统默认样式",
+    "measure": {"height": "72px", "indicator": "24x2.5px"},
+    "fix": "无需修改，tab 选中态表达清晰",
+    "resolved": true
+  }
+]

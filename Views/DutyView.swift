@@ -1,4 +1,4 @@
-import SwiftUI
+﻿import SwiftUI
 
 // 值日表
 struct DutyView: View {
@@ -25,19 +25,29 @@ struct DutyView: View {
                     }
                     .padding()
                 }
-                .background(Color(.systemGroupedBackground))
+                .background(AppTheme.Colors.background)
             }
         }
         .navigationTitle("值日表")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button {
-                    let maxGroup = viewModel.dutyGroups.map(\.groupNumber).max() ?? 0
-                    viewModel.addDutyGroup(DutyGroup(groupNumber: maxGroup + 1))
+                Menu {
+                    Button {
+                        let maxGroup = viewModel.dutyGroups.map(\.groupNumber).max() ?? 0
+                        viewModel.addDutyGroup(DutyGroup(groupNumber: maxGroup + 1))
+                    } label: {
+                        Label("新建值日组", systemImage: "plus")
+                    }
+                    Button {
+                        printDuty()
+                    } label: {
+                        Label("打印值日表", systemImage: "printer")
+                    }
+                    .disabled(viewModel.dutyGroups.isEmpty)
                 } label: {
-                    Image(systemName: "plus")
+                    Image(systemName: "ellipsis.circle")
                 }
-                .disabled(viewModel.students.isEmpty)
             }
         }
         .sheet(item: $editingGroup) { group in
@@ -45,6 +55,21 @@ struct DutyView: View {
                 DutyGroupEditView(group: group)
             }
         }
+    }
+
+    private func printDuty() {
+        let groups = sortedGroups.map { group -> (name: String, members: [String]) in
+            let members = group.memberIds.compactMap { id in
+                viewModel.students.first(where: { $0.id == id })?.name
+            }
+            return ("第\(group.groupNumber)组", members)
+        }
+        let currentIndex = sortedGroups.firstIndex(where: { $0.id == viewModel.currentDutyGroup?.id }) ?? 0
+        PrintService.shared.printDuty(
+            className: viewModel.classInfo.className,
+            groups: groups,
+            currentGroupIndex: currentIndex
+        )
     }
 
     // 当前值日组
@@ -80,7 +105,7 @@ struct DutyView: View {
                     Spacer()
                 }
                 .padding(16)
-                .background(Color(.secondarySystemGroupedBackground))
+                .background(AppTheme.Colors.cardBackground)
                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             }
         }
@@ -128,7 +153,7 @@ struct DutyView: View {
                     }
                 }
             }
-            .background(Color(.secondarySystemGroupedBackground))
+            .background(AppTheme.Colors.cardBackground)
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         }
     }

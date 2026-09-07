@@ -1,4 +1,4 @@
-import SwiftUI
+﻿import SwiftUI
 
 // 通知记录列表
 struct NotificationListView: View {
@@ -130,7 +130,7 @@ struct NotificationDetailView: View {
                     }
                     .padding()
                 }
-                .background(Color(.systemGroupedBackground))
+                .background(AppTheme.Colors.background)
                 .onAppear { viewModel.markNotificationRead(item) }
                 .toolbar {
                     ToolbarItem(placement: .primaryAction) {
@@ -155,9 +155,15 @@ struct NotificationComposeView: View {
     @EnvironmentObject var viewModel: AppViewModel
     @Environment(\.dismiss) private var dismiss
 
-    @State private var title = ""
-    @State private var content = ""
-    @State private var audience = "全班"
+    @State private var title: String
+    @State private var content: String
+    @State private var audience: String
+
+    init(preFillTitle: String = "", preFillContent: String = "", preFillAudience: String = "全班") {
+        _title = State(initialValue: preFillTitle)
+        _content = State(initialValue: preFillContent)
+        _audience = State(initialValue: preFillAudience)
+    }
 
     var body: some View {
         NavigationStack {

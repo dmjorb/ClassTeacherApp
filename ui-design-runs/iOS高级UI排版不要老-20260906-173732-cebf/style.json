@@ -1,0 +1,31 @@
+{
+  "query": "iOS 高级 UI 排版 不要老旧的排版",
+  "signature": {
+    "ground": null,
+    "typeVoice": null,
+    "imageWorld": null,
+    "layoutLogic": null,
+    "colorStrategy": "mono-neutral",
+    "motionVoice": null
+  },
+  "why": {
+    "ground": "query 没给这一维的信号 —— 由你按内容定",
+    "typeVoice": "query 没给这一维的信号 —— 由你按内容定",
+    "imageWorld": "query 没给这一维的信号 —— 由你按内容定",
+    "layoutLogic": "query 没给这一维的信号 —— 由你按内容定",
+    "colorStrategy": "语义命中 1 个线索",
+    "motionVoice": "query 没给这一维的信号 —— 由你按内容定"
+  },
+  "open": [
+    "ground",
+    "typeVoice",
+    "imageWorld",
+    "layoutLogic",
+    "motionVoice"
+  ],
+  "divergence": {
+    "vsRecent": [],
+    "min": null,
+    "require": 3
+  }
+}

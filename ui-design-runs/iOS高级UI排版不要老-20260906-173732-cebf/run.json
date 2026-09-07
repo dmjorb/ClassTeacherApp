@@ -1,0 +1,152 @@
+{
+  "version": 1,
+  "created": "2026-09-06T17:37:32",
+  "query": "iOS 高级 UI 排版 不要老旧的排版",
+  "contract": {
+    "query": "iOS 高级 UI 排版 不要老旧的排版",
+    "artifactClass": "mobile",
+    "surface": "mobile-app",
+    "provenance": "explicit",
+    "operation": "create",
+    "handoff": [
+      "html",
+      "doc"
+    ],
+    "count": {
+      "unit": "屏",
+      "n": null,
+      "mode": "target",
+      "source": "载体默认"
+    },
+    "canvas": {
+      "w": 390,
+      "h": 844,
+      "source": "载体默认"
+    },
+    "ledger": [
+      {
+        "kind": "避免",
+        "value": "老旧的排版",
+        "block": false
+      }
+    ],
+    "attachments": [],
+    "skeleton": "app",
+    "title": "iOS 高级 UI 排版 不要老旧的排版 · 设计方案",
+    "workdir": "C:\\Users\\DMJ\\Desktop\\ClassTeacherApp\\ui-design-runs\\iOS高级UI排版不要老-20260906-173732-cebf",
+    "deliverables": {
+      "doc": {
+        "proposal": "doc/proposal.xml",
+        "canvases": [
+          "doc/canvas-a.html",
+          "doc/canvas-b.html"
+        ],
+        "cover": "doc/cover.html",
+        "coverImage": "shots/cover.jpg",
+        "required": true,
+        "note": "设计思路、设计想法、设计语言、为什么这么设计；窄栏排版画布，像一份印出来的专题"
+      },
+      "product": {
+        "path": "app/index.html",
+        "profile": "app-screen",
+        "required": true,
+        "shape": "产品界面",
+        "h5Shape": "产品界面",
+        "note": "**真实产品界面原型**：首屏就是用户日常会看到的那一屏，不是关于它的说明"
+      }
+    },
+    "assetPlan": [
+      {
+        "role": "hero-bg",
+        "how": "image_gen",
+        "slot": "full-bleed",
+        "why": "首屏满版氛围，文字压在上面"
+      },
+      {
+        "role": "icon-set",
+        "how": "svg",
+        "slot": "inline",
+        "why": "图标必须用 SVG——生图出不了透明底"
+      },
+      {
+        "role": "texture",
+        "how": "css",
+        "slot": "layer",
+        "why": "底纹用 CSS 画，不占素材预算"
+      },
+      {
+        "role": "scene-01",
+        "how": "image_gen",
+        "slot": "full-bleed",
+        "why": "一张能定调的场景"
+      }
+    ],
+    "minVisualAssets": 5,
+    "frozen": "2026-09-06T17:37:32",
+    "hash": "80564bf2bb67e082"
+  },
+  "style": {
+    "query": "iOS 高级 UI 排版 不要老旧的排版",
+    "signature": {
+      "ground": null,
+      "typeVoice": null,
+      "imageWorld": null,
+      "layoutLogic": null,
+      "colorStrategy": "mono-neutral",
+      "motionVoice": null
+    },
+    "why": {
+      "ground": "query 没给这一维的信号 —— 由你按内容定",
+      "typeVoice": "query 没给这一维的信号 —— 由你按内容定",
+      "imageWorld": "query 没给这一维的信号 —— 由你按内容定",
+      "layoutLogic": "query 没给这一维的信号 —— 由你按内容定",
+      "colorStrategy": "语义命中 1 个线索",
+      "motionVoice": "query 没给这一维的信号 —— 由你按内容定"
+    },
+    "open": [
+      "ground",
+      "typeVoice",
+      "imageWorld",
+      "layoutLogic",
+      "motionVoice"
+    ],
+    "divergence": {
+      "vsRecent": [],
+      "min": null,
+      "require": 3
+    }
+  },
+  "receipts": {
+    "shot": [],
+    "observe": [],
+    "check": [
+      {
+        "ts": "2026-09-06T17:43:24",
+        "profile": "app-screen",
+        "target": "app/index.html",
+        "sha": {
+          "app/index.html": "3f9f83c8bb04"
+        },
+        "block": [],
+        "report": [],
+        "assetCount": null,
+        "passed": true
+      },
+      {
+        "ts": "2026-09-06T17:45:54",
+        "profile": "app-screen",
+        "target": "app/index.html",
+        "sha": {
+          "app/index.html": "3f9f83c8bb04"
+        },
+        "block": [],
+        "report": [],
+        "assetCount": null,
+        "passed": true
+      }
+    ],
+    "publish": [],
+    "read": []
+  },
+  "delivery": null
+}

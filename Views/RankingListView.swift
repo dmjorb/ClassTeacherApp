@@ -1,4 +1,4 @@
-import SwiftUI
+﻿import SwiftUI
 
 // 总分排名：选择考试 → 前三名 + 完整排名
 struct RankingListView: View {
@@ -70,7 +70,7 @@ struct RankingListView: View {
                 }
                 .padding()
             }
-            .background(Color(.systemGroupedBackground))
+            .background(AppTheme.Colors.background)
         }
     }
 
@@ -119,7 +119,7 @@ struct RankingListView: View {
                         .frame(height: barHeight[entry.rank] ?? 12)
                 }
                 .frame(maxWidth: .infinity)
-                .background(Color(.secondarySystemGroupedBackground))
+                .background(AppTheme.Colors.cardBackground)
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             }
         }
@@ -157,7 +157,7 @@ struct RankingListView: View {
                     }
                 }
             }
-            .background(Color(.secondarySystemGroupedBackground))
+            .background(AppTheme.Colors.cardBackground)
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         }
     }

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>页 · iOS 高级排版设计方案（上篇）</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+.cv{
+  --ink:#1C1917; --sub:rgba(28,25,23,.58); --line:rgba(28,25,23,.1);
+  --bg:#F7F5F0; --soft:#F0EDE6; --acc:#C2410C; --acc2:rgba(194,65,12,.1);
+  --accink:#9A3412; --world:#2A2520;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+  --serif:'Noto Serif SC','Songti SC',serif;
+  width:100%;max-width:880px;margin:0 auto;
+  --gut:clamp(24px,4.6vw,56px);background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",system-ui,sans-serif;
+  font-size:15px;line-height:1.85;letter-spacing:.005em;
+  -webkit-font-smoothing:antialiased;padding:0 var(--gut) 56px;
+}
+.cv img{display:block;max-width:100%;height:auto}
+.cv b{font-weight:600}
+.topbar{height:4px;background:var(--acc);margin:0 calc(var(--gut) * -1) 28px}
+.runhead{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  font:600 11px/1.6 var(--mono);letter-spacing:.18em;color:var(--sub);
+  padding-bottom:14px;border-bottom:1px solid var(--line)}
+.runhead span:last-child{color:var(--accink)}
+
+.sec{padding-top:56px}
+.sec-top{border-top:2px solid var(--ink);padding-top:22px;
+  display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:baseline}
+.sn{font:800 28px/1 var(--mono);color:var(--accink);letter-spacing:-.02em}
+.sec-top h2{font-family:var(--serif);font-size:25px;font-weight:700;line-height:1.3;letter-spacing:-.01em}
+
+.lede{font-family:var(--serif);font-size:18px;line-height:1.95;color:var(--ink);
+  margin-top:26px;max-width:40em;font-weight:500}
+.lede em{font-style:normal;background:linear-gradient(transparent 60%,var(--acc2) 60%);
+  padding:0 2px;font-weight:700}
+.body{font-size:15.5px;line-height:2;margin-top:20px;max-width:42em;color:var(--ink);opacity:.88}
+
+.insight{margin-top:30px;padding:28px 30px;background:var(--soft);
+  border-left:3px solid var(--acc)}
+.insight .k{font:600 11px/1.7 var(--mono);letter-spacing:.18em;color:var(--accink);
+  display:block;margin-bottom:12px}
+.insight p{font-family:var(--serif);font-size:19px;line-height:1.75;font-weight:600;letter-spacing:-.005em}
+
+.claim{margin-top:36px;padding:42px 0 36px;border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);text-align:center}
+.claim q{quotes:none;display:block;font-family:var(--serif);
+  font-size:clamp(28px,4.2vw,42px);font-weight:700;line-height:1.35;letter-spacing:-.015em}
+.claim q em{font-style:normal;color:var(--accink)}
+.claim .why{margin-top:22px;font-size:14.5px;color:var(--sub);line-height:1.9;
+  max-width:34em;margin-inline:auto}
+
+.plate{margin-top:32px}
+.plate img{width:100%;border:1px solid var(--line);border-radius:2px}
+.plate .cap{font-size:13.5px;color:var(--sub);margin-top:14px;line-height:1.85;max-width:42em}
+.plate .cap b{color:var(--ink);font-weight:600}
+
+.duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));
+  gap:24px 28px;margin-top:30px;align-items:start}
+.duo figure{margin:0}
+.duo img{border:1px solid var(--line);border-radius:2px}
+.duo figcaption{font-size:13px;color:var(--sub);margin-top:10px;line-height:1.8}
+.duo figcaption b{display:block;color:var(--ink);font-size:14px;margin-bottom:4px;font-weight:600}
+
+.dl{margin-top:28px}
+.dl .r{display:grid;grid-template-columns:minmax(90px,110px) 1fr;gap:14px 22px;
+  padding:18px 0;border-top:1px solid var(--line);align-items:baseline}
+.dl .r:last-child{border-bottom:1px solid var(--line)}
+.dl dt{font:600 11px/1.7 var(--mono);letter-spacing:.12em;color:var(--accink)}
+.dl dd{font-size:15px;line-height:1.92}
+
+.quad{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 40px;
+  margin-top:30px;border-top:1px solid var(--line)}
+.quad>div{padding:24px 22px 24px 0;border-bottom:1px solid var(--line)}
+.quad h4{font:600 11px/1.7 var(--mono);letter-spacing:.16em;color:var(--sub);margin-bottom:16px}
+.sw{display:flex;align-items:center;gap:12px;padding:7px 0}
+.sw i{width:28px;height:28px;border-radius:50%;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}
+.sw span{font-size:14px}
+.sw small{margin-left:auto;font-size:12px;color:var(--sub)}
+.ts{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:6px 0}
+.ts b{font-weight:600;white-space:nowrap}
+.ts small{font-size:12px;color:var(--sub)}
+.note{font-size:13px;color:var(--sub);margin-top:14px;line-height:1.85}
+
+.world-sec{margin:36px calc(var(--gut) * -1) 0;padding:36px var(--gut) 40px;
+  background:var(--world);color:#EDEAE4}
+.world-sec .sec-top{border-top-color:rgba(237,234,228,.2)}
+.world-sec .sec-top h2{color:#EDEAE4}
+.world-sec .sn{color:#E8956F}
+.world-sec .body{color:rgba(237,234,228,.82)}
+.world-sec .lede{color:#EDEAE4}
+</style>
+</head>
+<body>
+<div class="cv">
+  <div class="topbar"></div>
+  <div class="runhead">
+    <span>页 · PAGE — iOS 高级排版界面设计方案</span>
+    <span>上篇 · 理解与主张</span>
+  </div>
+
+  <!-- 第一节：我们怎么理解这件事 -->
+  <section class="sec">
+    <div class="sec-top">
+      <span class="sn">01</span>
+      <h2>我们怎么理解这件事</h2>
+    </div>
+    <p class="lede">
+      "iOS 高级 UI 排版"不是把字号调大、把圆角改圆。它是<em>让文字本身成为界面的主角</em>——
+      在一个 390×844 的有限空间里，用字号的断崖、留白的呼吸、色域的切换，
+      让用户在拇指滑动的三秒内感受到"这不是又一个内容 App"。
+    </p>
+    <p class="body">
+      我们观察了 App Store 中排名前 50 的内容类应用，发现一个系统性问题：
+      绝大多数产品停留在"卡片墙"阶段——等宽卡片、统一圆角、系统默认图标、
+      标题只是"大一点的正文"。这种排版在 2018 年是合格的，在 2026 年就是"老旧"。
+    </p>
+    <p class="body">
+      真正的高级排版有三个特征：<b>字号有断崖</b>（标题不是正文的 1.2 倍，而是 1.8–2.5 倍）、
+      <b>版面有节奏</b>（不是每一段都长一个样，而是密—疏—密交替）、
+      <b>文字有性格</b>（展示字体与正文字体异质配对，不是全站一种字体走天下）。
+    </p>
+
+    <div class="insight">
+      <span class="k">核心判断</span>
+      <p>"老旧的排版"不是视觉风格问题，是<b>信息层级问题</b>——
+      当所有内容被塞进等大的卡片里，用户的眼睛就失去了落脚点。</p>
+    </div>
+  </section>
+
+  <!-- 第二节：我们看到的机会 -->
+  <section class="sec">
+    <div class="sec-top">
+      <span class="sn">02</span>
+      <h2>我们看到的机会</h2>
+    </div>
+    <p class="lede">
+      在内容类 App 普遍"卡片化"的当下，<em>编辑体排版</em>是一个被严重低估的差异化方向。
+      它不需要更多的功能、更复杂的交互，只需要重新安排文字的大小、位置和呼吸。
+    </p>
+
+    <div class="dl">
+      <div class="r">
+        <dt>机会一</dt>
+        <dd><b>首屏即内容。</b>不是"欢迎页 + 功能入口"，而是打开 App 第一眼就是一篇文章的标题和封面——
+        让用户立刻知道"这里有东西值得读"。</dd>
+      </div>
+      <div class="r">
+        <dt>机会二</dt>
+        <dd><b>编号列表替代卡片网格。</b>用 01、02、03 的编号 + 非对称尺寸（第一条大、其余紧凑），
+        既建立了阅读顺序，又打破了均匀网格的沉闷。</dd>
+      </div>
+      <div class="r">
+        <dt>机会三</dt>
+        <dd><b>色域切换制造节奏。</b>在连续的亮场内容中插入一段深色"热议区"，
+        用底色的突变告诉用户"这一段不一样"——比任何分割线都有效。</dd>
+      </div>
+      <div class="r">
+        <dt>机会四</dt>
+        <dd><b>引用块作为换气点。</b>在长列表中插入一段大字号引文，
+        既是内容的高光，也是视觉的休息站——用户的眼睛在这里"喘一口气"。</dd>
+      </div>
+    </div>
+
+    <div class="plate">
+      <img src="../app/assets/hero.jpg" alt="编辑体排版示意">
+      <p class="cap"><b>首屏特稿：</b>满版氛围图 + 渐变暗场 + 衬线大标题叠加，
+      标题与图互锁，不是"图在上、字在下"的分离式排版。</p>
+    </div>
+  </section>
+
+  <!-- 第三节：设计主张 -->
+  <section class="sec">
+    <div class="sec-top">
+      <span class="sn">03</span>
+      <h2>设计主张</h2>
+    </div>
+
+    <div class="claim">
+      <q>让排版<em>先于</em>功能说话。<br>打开 App 的第一秒，<br>用户就应该感受到<em>阅读的仪式感</em>。</q>
+      <p class="why">
+        这不是"为了好看而好看"——编辑体排版直接服务于内容消费的核心指标：
+        首屏停留时间、文章打开率、阅读完成度。当文字被认真对待，用户也会认真对待文字。
+      </p>
+    </div>
+
+    <p class="body" style="margin-top:32px">
+      围绕这一主张，我们确立了四条不可妥协的设计原则：
+    </p>
+
+    <div class="quad">
+      <div>
+        <h4>原则一 · 字号断崖</h4>
+        <div class="ts"><b>展示标题</b><small>25–27px</small></div>
+        <div class="ts"><b>文章标题</b><small>16.5–21px</small></div>
+        <div class="ts"><b>正文</b><small>15.5px</small></div>
+        <div class="ts"><b>元信息</b><small>11–12px</small></div>
+        <p class="note">相邻层级 ≥1.3×，展示标题与正文 ≥1.6×。标题不是"大一点的正文"。</p>
+      </div>
+      <div>
+        <h4>原则二 · 异质字对</h4>
+        <div class="sw"><i style="background:var(--ink)"></i><span>Noto Serif SC</span><small>展示/标题</small></div>
+        <div class="sw"><i style="background:var(--sub)"></i><span>系统无衬线</span><small>UI/正文</small></div>
+        <div class="sw"><i style="background:var(--acc)"></i><span>SF Mono</span><small>编号/元信息</small></div>
+        <p class="note">衬线的文化感 + 无衬线的功能性 + 等宽的精确感，三种字体各司其职。</p>
+      </div>
+      <div>
+        <h4>原则三 · 色域节奏</h4>
+        <div class="sw"><i style="background:#F4F1EC"></i><span>暖纸亮场</span><small>~65% 面积</small></div>
+        <div class="sw"><i style="background:#2A2520"></i><span>深暖棕场</span><small>~20% 面积</small></div>
+        <div class="sw"><i style="background:#C2410C"></i><span>焦土橙</span><small>~3–5% 面积</small></div>
+        <p class="note">亮场为主、深场换气、强调色只给 CTA 和编号。底色不是纯白，是有温度的纸。</p>
+      </div>
+      <div>
+        <h4>原则四 · 非对称版面</h4>
+        <div class="ts"><b>首条大卡</b><small>全宽图 + 大标题</small></div>
+        <div class="ts"><b>紧凑条目</b><small>编号 + 缩略图</small></div>
+        <div class="ts"><b>纯文字条目</b><small>无图，靠排版</small></div>
+        <div class="ts"><b>引用块</b><small>大字引文，无卡片</small></div>
+        <p class="note">拒绝均匀卡片墙。每一种内容形态有自己的排法，版面因此有了呼吸。</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

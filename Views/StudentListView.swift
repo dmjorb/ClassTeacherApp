@@ -1,16 +1,35 @@
-import SwiftUI
+﻿import SwiftUI
 import UIKit
 
-// 学生名册
+// 学生名册 — 高级排版版
 struct StudentListView: View {
     @EnvironmentObject var viewModel: AppViewModel
     @Environment(\.openURL) private var openURL
     @State private var searchText = ""
     @State private var showingAdd = false
+    @State private var seatFilter: Int? = nil  // nil = 全部，0 = 未排座，1... = 第N排
+
+    // 最大排数（用于筛选标签）
+    private var maxSeatRow: Int {
+        let maxRow = viewModel.students.map { $0.seatRow }.max() ?? 0
+        return max(maxRow, 6)
+    }
 
     private var filteredStudents: [Student] {
-        guard !searchText.isEmpty else { return viewModel.students }
-        return viewModel.students.filter {
+        var result = viewModel.students
+
+        // 按排筛选
+        if let seatFilter = seatFilter {
+            if seatFilter == 0 {
+                result = result.filter { $0.seatRow == 0 }
+            } else {
+                result = result.filter { $0.seatRow == seatFilter }
+            }
+        }
+
+        // 搜索
+        guard !searchText.isEmpty else { return result }
+        return result.filter {
             $0.name.localizedCaseInsensitiveContains(searchText)
                 || $0.studentNumber.localizedCaseInsensitiveContains(searchText)
                 || $0.phone.contains(searchText)
@@ -27,37 +46,53 @@ struct StudentListView: View {
                     message: searchText.isEmpty ? "点击右上角 + 添加学生" : "换个关键词试试"
                 )
             } else {
-                List {
-                    ForEach(filteredStudents) { student in
-                        NavigationLink {
-                            StudentDetailView(studentId: student.id)
-                        } label: {
-                            StudentRow(student: student)
+                ScrollView {
+                    VStack(spacing: 10) {
+                        // 统计
+                        HStack {
+                            Text("\(filteredStudents.count) 位学生")
+                                .font(AppTheme.Fonts.caption.weight(.semibold))
+                                .foregroundColor(AppTheme.Colors.tertiaryText)
+                            Spacer()
                         }
-                        .contextMenu {
-                            if !student.phone.isEmpty, let url = telURL(student.phone) {
-                                Button {
-                                    openURL(url)
-                                } label: {
-                                    Label("拨打学生电话 \(student.phone)", systemImage: "phone.fill")
-                                }
-                            }
-                            if !student.parentPhone.isEmpty, let url = telURL(student.parentPhone) {
-                                Button {
-                                    openURL(url)
-                                } label: {
-                                    Label("拨打家长电话 \(student.parentPhone)", systemImage: "phone.arrow.right.left")
-                                }
-                            }
-                            Button(role: .destructive) {
-                                viewModel.deleteStudent(student)
+                        .padding(.horizontal, 4)
+                        .padding(.top, 4)
+
+                        // 学生卡片列表
+                        ForEach(filteredStudents) { student in
+                            NavigationLink {
+                                StudentDetailView(studentId: student.id)
                             } label: {
-                                Label("删除学生", systemImage: "trash")
+                                StudentCard(student: student)
+                            }
+                            .buttonStyle(.plain)
+                            .contextMenu {
+                                if !student.phone.isEmpty, let url = telURL(student.phone) {
+                                    Button {
+                                        openURL(url)
+                                    } label: {
+                                        Label("拨打学生电话 \(student.phone)", systemImage: "phone.fill")
+                                    }
+                                }
+                                if !student.parentPhone.isEmpty, let url = telURL(student.parentPhone) {
+                                    Button {
+                                        openURL(url)
+                                    } label: {
+                                        Label("拨打家长电话 \(student.parentPhone)", systemImage: "phone.arrow.right.left")
+                                    }
+                                }
+                                Button(role: .destructive) {
+                                    viewModel.deleteStudent(student)
+                                } label: {
+                                    Label("删除学生", systemImage: "trash")
+                                }
                             }
                         }
                     }
-                    .onDelete(perform: deleteStudents)
+                    .padding(.horizontal, 18)
+                    .padding(.bottom, 24)
                 }
+                .background(AppTheme.Colors.background)
             }
         }
         .navigationTitle("学生名册")
@@ -82,12 +117,56 @@ struct StudentListView: View {
                 StudentFormView(mode: .add)
             }
         }
+        // 按排筛选标签（放在搜索栏下方）
+        .safeAreaInset(edge: .top) {
+            if !viewModel.students.isEmpty {
+                seatFilterBar
+            }
+        }
     }
 
-    private func deleteStudents(at offsets: IndexSet) {
-        for index in offsets {
-            viewModel.deleteStudent(filteredStudents[index])
+    // 按排筛选横向滚动标签
+    private var seatFilterBar: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                filterChip(title: "全部", isActive: seatFilter == nil) {
+                    seatFilter = nil
+                }
+                filterChip(title: "未排座", isActive: seatFilter == 0) {
+                    seatFilter = 0
+                }
+                ForEach(1...maxSeatRow, id: \.self) { row in
+                    filterChip(title: "第\(row)排", isActive: seatFilter == row) {
+                        seatFilter = row
+                    }
+                }
+            }
+            .padding(.horizontal, 18)
+            .padding(.vertical, 8)
         }
+        .background(AppTheme.Colors.background.opacity(0.95))
+        .background(.ultraThinMaterial)
+    }
+
+    private func filterChip(title: String, isActive: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(AppTheme.Fonts.caption.weight(.semibold))
+                .foregroundColor(isActive ? .white : AppTheme.Colors.secondaryText)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(
+                    Group {
+                        if isActive {
+                            AppTheme.Colors.primaryText
+                        } else {
+                            AppTheme.Colors.subtleBackground
+                        }
+                    }
+                )
+                .clipShape(Capsule())
+        }
+        .buttonStyle(.plain)
     }
 
     private func telURL(_ phone: String) -> URL? {
@@ -129,35 +208,69 @@ struct StudentListView: View {
     }
 }
 
-// 列表行
-struct StudentRow: View {
+// 学生卡片（替代原来的 List Row）
+struct StudentCard: View {
     let student: Student
 
     var body: some View {
-        HStack(spacing: 12) {
-            StudentAvatar(name: student.name, size: 44)
-            VStack(alignment: .leading, spacing: 3) {
-                HStack(spacing: 6) {
+        HStack(spacing: 14) {
+            StudentAvatar(name: student.name, size: 48)
+
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 8) {
                     Text(student.name)
-                        .font(.body.weight(.semibold))
+                        .font(AppTheme.Fonts.headline)
+                        .foregroundColor(AppTheme.Colors.primaryText)
                     Text("#\(student.studentNumber)")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                        .font(AppTheme.Fonts.caption2.weight(.medium))
+                        .foregroundColor(AppTheme.Colors.accent)
                 }
+
                 HStack(spacing: 10) {
-                    if !student.phone.isEmpty {
-                        Label(student.phone, systemImage: "phone")
-                            .font(.caption)
-                            .foregroundColor(.blue)
+                    // 小组标签
+                    HStack(spacing: 3) {
+                        Image(systemName: "person.3.fill")
+                            .font(.system(size: 9))
+                        Text("第\(student.groupNumber)组")
+                            .font(AppTheme.Fonts.caption2)
                     }
-                    Text("第\(student.groupNumber)组")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    .foregroundColor(AppTheme.Colors.secondaryText)
+
+                    // 座位标签
+                    if student.seatRow > 0 {
+                        HStack(spacing: 3) {
+                            Image(systemName: "chair.fill")
+                                .font(.system(size: 9))
+                            Text("\(student.seatRow)排\(student.seatCol)座")
+                                .font(AppTheme.Fonts.caption2)
+                        }
+                        .foregroundColor(AppTheme.Colors.secondaryText)
+                    }
+
+                    // 电话图标
+                    if !student.phone.isEmpty || !student.parentPhone.isEmpty {
+                        Image(systemName: "phone.fill")
+                            .font(.system(size: 9))
+                            .foregroundColor(.green)
+                    }
                 }
             }
+
             Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundColor(AppTheme.Colors.tertiaryText)
         }
-        .padding(.vertical, 2)
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(AppTheme.Colors.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: AppTheme.CornerRadius.card, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: AppTheme.CornerRadius.card, style: .continuous)
+                .stroke(AppTheme.Colors.separator, lineWidth: 0.5)
+        )
+        .rdShadow(AppTheme.Shadows.sm)
     }
 }
 
@@ -169,7 +282,6 @@ struct StudentDetailView: View {
     let studentId: UUID
     @State private var editing = false
 
-    // 从 viewModel 实时读取，编辑/排座后详情立即更新
     private var student: Student? { viewModel.student(id: studentId) }
 
     var body: some View {
@@ -182,6 +294,7 @@ struct StudentDetailView: View {
         }
         .navigationTitle(student?.name ?? "学生详情")
         .navigationBarTitleDisplayMode(.inline)
+        .background(AppTheme.Colors.background)
         .sheet(isPresented: $editing) {
             if let student = student {
                 NavigationStack {
@@ -193,59 +306,169 @@ struct StudentDetailView: View {
 
     @ViewBuilder
     private func detailBody(_ student: Student) -> some View {
-        Form {
-            Section("基本信息") {
-                LabeledContent("姓名", value: student.name)
-                LabeledContent("学号", value: student.studentNumber.isEmpty ? "—" : student.studentNumber)
-                LabeledContent("性别", value: student.gender.rawValue)
-                LabeledContent("小组", value: "第\(student.groupNumber)组")
-            }
-            Section("联系方式") {
-                if !student.phone.isEmpty {
-                    Button {
-                        if let url = telURL(student.phone) { openURL(url) }
-                    } label: {
-                        Label("学生电话 \(student.phone)", systemImage: "phone.fill")
+        ScrollView {
+            VStack(spacing: 16) {
+                // 顶部大头像卡
+                Card(padding: 20) {
+                    VStack(spacing: 12) {
+                        StudentAvatar(name: student.name, size: 72)
+                        Text(student.name)
+                            .font(AppTheme.Fonts.title)
+                            .foregroundColor(AppTheme.Colors.primaryText)
+                            .tracking(-0.5)
+                        HStack(spacing: 12) {
+                            PillTag(title: student.gender.rawValue, color: student.gender == .male ? .blue : .pink)
+                            PillTag(title: "第\(student.groupNumber)组", color: AppTheme.Colors.accent)
+                            if !student.studentNumber.isEmpty {
+                                PillTag(title: "#\(student.studentNumber)", color: .gray)
+                            }
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .padding(.horizontal, 18)
+                .padding(.top, 16)
+
+                // 联系方式
+                detailSection(title: "联系方式", systemImage: "phone.fill") {
+                    if !student.phone.isEmpty {
+                        contactRow(icon: "phone.fill", label: "学生电话", value: student.phone, color: .blue) {
+                            if let url = telURL(student.phone) { openURL(url) }
+                        }
+                    }
+                    if !student.parentPhone.isEmpty {
+                        contactRow(icon: "phone.arrow.right.left", label: "家长电话", value: student.parentPhone, color: .green) {
+                            if let url = telURL(student.parentPhone) { openURL(url) }
+                        }
+                    }
+                    if !student.address.isEmpty {
+                        infoRow(icon: "location.fill", label: "家庭住址", value: student.address)
+                    }
+                    if student.phone.isEmpty && student.parentPhone.isEmpty && student.address.isEmpty {
+                        Text("暂无联系方式")
+                            .font(AppTheme.Fonts.footnote)
+                            .foregroundColor(AppTheme.Colors.tertiaryText)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.vertical, 12)
                     }
                 }
-                if !student.parentPhone.isEmpty {
-                    Button {
-                        if let url = telURL(student.parentPhone) { openURL(url) }
-                    } label: {
-                        Label("家长电话 \(student.parentPhone)", systemImage: "phone.arrow.right.left")
+
+                // 座位与宿舍
+                detailSection(title: "座位与宿舍", systemImage: "chair.fill") {
+                    infoRow(icon: "chair.fill", label: "座位",
+                            value: student.seatRow > 0 ? "第\(student.seatRow)排第\(student.seatCol)座" : "未分配")
+                    infoRow(icon: "bed.double.fill", label: "宿舍",
+                            value: student.dormitory.isEmpty ? "—" : student.dormitory)
+                }
+
+                // 备注
+                if !student.notes.isEmpty {
+                    detailSection(title: "备注", systemImage: "note.text") {
+                        Text(student.notes)
+                            .font(AppTheme.Fonts.body)
+                            .foregroundColor(AppTheme.Colors.primaryText)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
-                if student.phone.isEmpty && student.parentPhone.isEmpty {
-                    Text("暂无联系方式")
-                        .foregroundColor(.secondary)
+
+                // 操作按钮
+                VStack(spacing: 10) {
+                    PrimaryButton(title: "编辑资料", systemImage: "pencil") {
+                        editing = true
+                    }
+                    Button(role: .destructive) {
+                        viewModel.deleteStudent(student)
+                        dismiss()
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "trash")
+                                .font(.system(size: 14, weight: .semibold))
+                            Text("删除学生")
+                                .font(AppTheme.Fonts.headline)
+                        }
+                        .foregroundColor(.red)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, AppTheme.Spacing.medium)
+                        .background(.red.opacity(0.08))
+                        .clipShape(RoundedRectangle(cornerRadius: AppTheme.CornerRadius.button, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
                 }
-                if !student.address.isEmpty {
-                    LabeledContent("家庭住址", value: student.address)
-                }
-            }
-            Section("座位与宿舍") {
-                LabeledContent("座位", value: student.seatRow > 0 ? "第\(student.seatRow)排第\(student.seatCol)座" : "未分配")
-                LabeledContent("宿舍", value: student.dormitory.isEmpty ? "—" : student.dormitory)
-            }
-            if !student.notes.isEmpty {
-                Section("备注") {
-                    Text(student.notes)
-                }
-            }
-            Section {
-                Button {
-                    editing = true
-                } label: {
-                    Label("编辑资料", systemImage: "pencil")
-                }
-                Button(role: .destructive) {
-                    viewModel.deleteStudent(student)
-                    dismiss()
-                } label: {
-                    Label("删除学生", systemImage: "trash")
-                }
+                .padding(.horizontal, 18)
+                .padding(.bottom, 32)
             }
         }
+        .background(AppTheme.Colors.background)
+    }
+
+    private func detailSection<Content: View>(title: String, systemImage: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 6) {
+                Image(systemName: systemImage)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(AppTheme.Colors.accent)
+                Text(title)
+                    .font(AppTheme.Fonts.title3)
+                    .foregroundColor(AppTheme.Colors.primaryText)
+                Spacer()
+            }
+            .padding(.horizontal, 22)
+
+            Card(padding: 4) {
+                content()
+            }
+            .padding(.horizontal, 18)
+        }
+    }
+
+    private func contactRow(icon: String, label: String, value: String, color: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(color)
+                    .frame(width: 32, height: 32)
+                    .background(color.opacity(0.12))
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(label)
+                        .font(AppTheme.Fonts.caption2)
+                        .foregroundColor(AppTheme.Colors.tertiaryText)
+                    Text(value)
+                        .font(AppTheme.Fonts.callout.weight(.medium))
+                        .foregroundColor(AppTheme.Colors.primaryText)
+                }
+                Spacer()
+                Image(systemName: "phone.fill")
+                    .font(.system(size: 12))
+                    .foregroundColor(color)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func infoRow(icon: String, label: String, value: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(AppTheme.Colors.secondaryText)
+                .frame(width: 32, height: 32)
+                .background(AppTheme.Colors.subtleBackground)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(label)
+                    .font(AppTheme.Fonts.caption2)
+                    .foregroundColor(AppTheme.Colors.tertiaryText)
+                Text(value)
+                    .font(AppTheme.Fonts.callout.weight(.medium))
+                    .foregroundColor(AppTheme.Colors.primaryText)
+            }
+            Spacer()
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
     }
 
     private func telURL(_ phone: String) -> URL? {

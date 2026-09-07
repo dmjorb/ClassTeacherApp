@@ -1,4 +1,4 @@
-import SwiftUI
+﻿import SwiftUI
 
 // 班级设置
 struct SettingsView: View {

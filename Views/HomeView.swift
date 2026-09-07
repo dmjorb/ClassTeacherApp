@@ -1,13 +1,26 @@
-import SwiftUI
+﻿import SwiftUI
 
-// 工作台首页
+// 工作台首页 — 高级排版版
 struct HomeView: View {
     @EnvironmentObject var viewModel: AppViewModel
     @State private var showingAddTodo = false
     @State private var newTodoTitle = ""
     @State private var showingCompose = false
 
-    private let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
+    // 4 列功能入口
+    private let columns = [
+        GridItem(.flexible(), spacing: 4),
+        GridItem(.flexible(), spacing: 4),
+        GridItem(.flexible(), spacing: 4),
+        GridItem(.flexible(), spacing: 4)
+    ]
+
+    // 统计卡片布局：主卡 1.4，次卡各 1
+    private let statColumns = [
+        GridItem(.flexible(minimum: 0, maximum: .infinity), spacing: 10),
+        GridItem(.flexible(minimum: 0, maximum: .infinity), spacing: 10),
+        GridItem(.flexible(minimum: 0, maximum: .infinity), spacing: 10)
+    ]
 
     private var greeting: String {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -25,14 +38,14 @@ struct HomeView: View {
                 header
                 statCards
                 functionGrid
-                nextDutySection
-                todayCoursesSection
+                dutySection
+                coursesSection
                 todoSection
             }
-            .padding(.horizontal)
-            .padding(.bottom, 24)
+            .padding(.horizontal, 18)
+            .padding(.bottom, 32)
         }
-        .background(Color(.systemGroupedBackground))
+        .background(AppTheme.Colors.background)
         .ignoresSafeArea(edges: .top)
         .toolbar(.hidden, for: .navigationBar)
         .alert("添加待办", isPresented: $showingAddTodo) {
@@ -53,275 +66,377 @@ struct HomeView: View {
         }
     }
 
-    // MARK: - 顶部渐变头部
+    // MARK: - 顶部大标题头部
     private var header: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(greeting)
-                .font(.subheadline)
-                .foregroundColor(.white.opacity(0.85))
+        VStack(alignment: .leading, spacing: 4) {
+            Text(greeting.uppercased())
+                .font(AppTheme.Fonts.caption.weight(.semibold))
+                .foregroundColor(AppTheme.Colors.tertiaryText)
+                .tracking(1.2)
+
             HStack(alignment: .firstTextBaseline) {
                 Text(viewModel.classInfo.className.isEmpty ? "我的班级" : viewModel.classInfo.className)
-                    .font(.title.bold())
-                    .foregroundColor(.white)
+                    .font(AppTheme.Fonts.largeTitle)
+                    .foregroundColor(AppTheme.Colors.primaryText)
+                    .tracking(-0.8)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
                 Spacer()
-                Text("\(viewModel.weekdayString) \(viewModel.todayString)")
-                    .font(.subheadline)
-                    .foregroundColor(.white.opacity(0.85))
+                VStack(alignment: .trailing, spacing: 2) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "calendar")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(AppTheme.Colors.accent)
+                        Text(viewModel.todayString)
+                            .font(AppTheme.Fonts.callout.weight(.semibold))
+                            .foregroundColor(AppTheme.Colors.primaryText)
+                    }
+                    Text(viewModel.weekdayString)
+                        .font(AppTheme.Fonts.caption2)
+                        .foregroundColor(AppTheme.Colors.tertiaryText)
+                }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 20)
-        .padding(.top, 60)
-        .padding(.bottom, 24)
-        .background(
-            LinearGradient(colors: [Color(red: 0.55, green: 0.40, blue: 0.85), Color(red: 0.72, green: 0.55, blue: 0.90)],
-                           startPoint: .topLeading, endPoint: .bottomTrailing)
-        )
+        .padding(.top, 64)
+        .padding(.bottom, 8)
     }
 
-    // MARK: - 数据概览
+    // MARK: - 数据概览（主卡 + 次卡）
     private var statCards: some View {
-        HStack(spacing: 12) {
-            StatCard(value: "\(viewModel.students.count)", label: "学生", systemImage: "person.2.fill", color: .blue)
-            StatCard(value: "\(viewModel.exams.count)", label: "考试", systemImage: "doc.text.fill", color: .orange)
-            StatCard(value: "\(viewModel.pendingTodos.count)", label: "待办", systemImage: "checklist", color: .green)
-        }
-    }
+        HStack(spacing: 10) {
+            StatCard(value: "\(viewModel.students.count)", label: "班级学生",
+                     systemImage: "person.2.fill", isPrimary: true)
+                .frame(maxWidth: .infinity)
 
-    // MARK: - 功能入口（全部为真实跳转/弹窗）
-    private var functionGrid: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("功能")
-                .font(.headline)
-                .padding(.horizontal, 4)
-
-            LazyVGrid(columns: columns, spacing: 12) {
-                NavigationLink { StudentListView() } label: {
-                    FeatureButton(title: "学生名册", systemImage: "person.2.fill", color: .blue)
-                }
-                .buttonStyle(.plain)
-
-                NavigationLink { ExamListView() } label: {
-                    FeatureButton(title: "成绩管理", systemImage: "chart.bar.fill", color: .orange)
-                }
-                .buttonStyle(.plain)
-
-                NavigationLink { SeatView() } label: {
-                    FeatureButton(title: "座位表", systemImage: "square.grid.3x3.fill", color: .teal)
-                }
-                .buttonStyle(.plain)
-
-                NavigationLink { ScheduleView() } label: {
-                    FeatureButton(title: "班级课表", systemImage: "calendar", color: .purple)
-                }
-                .buttonStyle(.plain)
-
-                NavigationLink { DutyView() } label: {
-                    FeatureButton(title: "值日表", systemImage: "broom.fill", color: .green)
-                }
-                .buttonStyle(.plain)
-
-                Button {
-                    showingCompose = true
-                } label: {
-                    FeatureButton(title: "发通知", systemImage: "megaphone.fill", color: .red)
-                }
-                .buttonStyle(.plain)
-
-                NavigationLink { NotificationListView() } label: {
-                    ZStack(alignment: .topTrailing) {
-                        FeatureButton(title: "通知记录", systemImage: "bell.fill", color: .indigo)
-                        if viewModel.unreadNotificationCount > 0 {
-                            Text("\(viewModel.unreadNotificationCount)")
-                                .font(.caption2.weight(.bold))
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 5)
-                                .padding(.vertical, 1)
-                                .background(Capsule().fill(Color.red))
-                                .offset(x: -8, y: 4)
-                        }
-                    }
-                }
-                .buttonStyle(.plain)
-
-                NavigationLink { RankingListView() } label: {
-                    FeatureButton(title: "总分排名", systemImage: "list.number", color: .pink)
-                }
-                .buttonStyle(.plain)
-
-                NavigationLink { AlbumListView() } label: {
-                    FeatureButton(title: "班级相册", systemImage: "photo.on.rectangle.angled", color: .cyan)
-                }
-                .buttonStyle(.plain)
-
-                NavigationLink { ClassMapView() } label: {
-                    FeatureButton(title: "分布地图", systemImage: "map.fill", color: .brown)
-                }
-                .buttonStyle(.plain)
-
-                NavigationLink { SettingsView() } label: {
-                    FeatureButton(title: "班级设置", systemImage: "gearshape.fill", color: .gray)
-                }
-                .buttonStyle(.plain)
+            VStack(spacing: 10) {
+                StatCard(value: "\(viewModel.exams.count)", label: "考试",
+                         systemImage: "doc.text.fill", color: .blue)
+                StatCard(value: "\(viewModel.pendingTodos.count)", label: "待办",
+                         systemImage: "checklist", color: .green)
             }
+            .frame(width: 108)
         }
-        .padding(.vertical, 16)
-        .padding(.horizontal, 12)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .frame(height: 120)
     }
 
-    // MARK: - 下次值日
-    @ViewBuilder
-    private var nextDutySection: some View {
-        if let duty = viewModel.currentDutyGroup {
+    // MARK: - 功能入口（4 列紧凑网格，用户可自定义）
+    private var functionGrid: some View {
+        Card(padding: 14) {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
-                    Text("值日安排")
-                        .font(.headline)
+                    Text("常用功能")
+                        .font(AppTheme.Fonts.title2)
+                        .foregroundColor(AppTheme.Colors.primaryText)
+                        .tracking(-0.3)
                     Spacer()
-                    Button("换下一组") {
-                        withAnimation { viewModel.nextDutyGroup() }
+                    NavigationLink {
+                        HomeFeatureManagerView()
+                    } label: {
+                        HStack(spacing: 3) {
+                            Image(systemName: "slider.horizontal.3")
+                                .font(.system(size: 11, weight: .semibold))
+                            Text("管理")
+                                .font(AppTheme.Fonts.caption.weight(.semibold))
+                        }
+                        .foregroundColor(AppTheme.Colors.accent)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(AppTheme.Colors.accentSoft)
+                        .clipShape(Capsule())
                     }
-                    .font(.subheadline)
-                    .foregroundColor(.accentColor)
+                    .buttonStyle(.plain)
                 }
-                HStack(spacing: 14) {
-                    Text("\(duty.groupNumber)")
-                        .font(.title2.bold())
-                        .foregroundColor(.white)
-                        .frame(width: 52, height: 52)
-                        .background(Color.green)
-                        .clipShape(Circle())
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("第\(duty.groupNumber)值日组")
-                            .font(.body.weight(.semibold))
-                        Text(viewModel.dutyStudentNames(of: duty).isEmpty ? "未安排成员" : viewModel.dutyStudentNames(of: duty))
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .lineLimit(1)
+
+                LazyVGrid(columns: columns, spacing: 8) {
+                    ForEach(viewModel.visibleHomeFeatures) { feature in
+                        featureButton(for: feature)
                     }
-                    Spacer()
                 }
-                .padding(14)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color(.secondarySystemGroupedBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            }
+        }
+    }
+
+    // 根据功能配置渲染对应按钮
+    @ViewBuilder
+    private func featureButton(for feature: AppViewModel.HomeFeature) -> some View {
+        switch feature.id {
+        case "schedule":
+            NavigationLink { ScheduleView() } label: {
+                FeatureButton(title: feature.name, systemImage: feature.systemImage, color: .purple)
+            }
+            .buttonStyle(.plain)
+        case "duty":
+            NavigationLink { DutyView() } label: {
+                FeatureButton(title: feature.name, systemImage: feature.systemImage, color: .green)
+            }
+            .buttonStyle(.plain)
+        case "seat":
+            NavigationLink { SeatView() } label: {
+                FeatureButton(title: feature.name, systemImage: feature.systemImage, color: .teal)
+            }
+            .buttonStyle(.plain)
+        case "map":
+            NavigationLink { ClassMapView() } label: {
+                FeatureButton(title: feature.name, systemImage: feature.systemImage, color: .brown)
+            }
+            .buttonStyle(.plain)
+        case "album":
+            NavigationLink { AlbumListView() } label: {
+                FeatureButton(title: feature.name, systemImage: feature.systemImage, color: .cyan)
+            }
+            .buttonStyle(.plain)
+        case "notification":
+            Button {
+                showingCompose = true
+            } label: {
+                FeatureButton(title: feature.name, systemImage: feature.systemImage, color: .red)
+            }
+            .buttonStyle(.plain)
+        case "ranking":
+            NavigationLink { RankingListView() } label: {
+                FeatureButton(title: feature.name, systemImage: feature.systemImage, color: .pink)
+            }
+            .buttonStyle(.plain)
+        case "scoreImport":
+            NavigationLink { ExamListView() } label: {
+                FeatureButton(title: feature.name, systemImage: feature.systemImage, color: .orange)
+            }
+            .buttonStyle(.plain)
+        case "templates":
+            NavigationLink { NotificationTemplateView() } label: {
+                FeatureButton(title: feature.name, systemImage: feature.systemImage, color: .indigo)
+            }
+            .buttonStyle(.plain)
+        case "settings":
+            NavigationLink { SettingsView() } label: {
+                FeatureButton(title: feature.name, systemImage: feature.systemImage, color: .gray)
+            }
+            .buttonStyle(.plain)
+        case "print":
+            Button {
+                // 打印中心：快速打印课表
+                PrintService.shared.printSchedule(
+                    className: viewModel.classInfo.className,
+                    weekDays: ["周一","周二","周三","周四","周五","周六","周日"],
+                    periods: Array(1...8),
+                    schedule: []
+                )
+            } label: {
+                FeatureButton(title: feature.name, systemImage: feature.systemImage, color: .blue)
+            }
+            .buttonStyle(.plain)
+        default:
+            FeatureButton(title: feature.name, systemImage: feature.systemImage, color: .gray)
+        }
+    }
+
+    // MARK: - 值日安排
+    @ViewBuilder
+    private var dutySection: some View {
+        if let duty = viewModel.currentDutyGroup {
+            Card(padding: 16) {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Text("今日值日")
+                            .font(AppTheme.Fonts.title2)
+                            .foregroundColor(AppTheme.Colors.primaryText)
+                            .tracking(-0.3)
+                        Spacer()
+                        Button {
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                viewModel.nextDutyGroup()
+                            }
+                        } label: {
+                            HStack(spacing: 3) {
+                                Text("下一组")
+                                    .font(AppTheme.Fonts.caption.weight(.semibold))
+                                Image(systemName: "arrow.right")
+                                    .font(.system(size: 10, weight: .semibold))
+                            }
+                            .foregroundColor(AppTheme.Colors.accent)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(AppTheme.Colors.accentSoft)
+                            .clipShape(Capsule())
+                        }
+                        .buttonStyle(.plain)
+                    }
+
+                    HStack(spacing: 14) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .fill(AppTheme.Colors.accentGradient)
+                                .frame(width: 52, height: 52)
+                            Text("\(duty.groupNumber)")
+                                .font(.system(size: 22, weight: .heavy))
+                                .foregroundColor(.white)
+                        }
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text("第\(duty.groupNumber)值日组")
+                                .font(AppTheme.Fonts.headline)
+                                .foregroundColor(AppTheme.Colors.primaryText)
+                            Text(viewModel.dutyStudentNames(of: duty).isEmpty ? "未安排成员" : viewModel.dutyStudentNames(of: duty))
+                                .font(AppTheme.Fonts.footnote)
+                                .foregroundColor(AppTheme.Colors.secondaryText)
+                                .lineLimit(2)
+                        }
+                        Spacer()
+                    }
+                }
             }
         }
     }
 
     // MARK: - 今日课程
-    private var todayCoursesSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("今日课程")
-                    .font(.headline)
-                Spacer()
-                NavigationLink("课表") { ScheduleView() }
-                    .font(.subheadline)
-                    .foregroundColor(.accentColor)
-            }
-
-            let todayCourses = viewModel.todayCourses()
-            if todayCourses.isEmpty {
-                Text("今天没有排课")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.vertical, 20)
-                    .background(Color(.secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-            } else {
-                VStack(spacing: 0) {
-                    ForEach(Array(todayCourses.enumerated()), id: \.element.id) { index, course in
-                        HStack(spacing: 12) {
-                            Text("第\(course.period)节")
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundColor(.accentColor)
-                                .frame(width: 56, alignment: .leading)
-                            Text(course.subject)
-                                .font(.body.weight(.medium))
-                            if !course.teacher.isEmpty {
-                                Text(course.teacher)
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            Spacer()
-                            if !course.classroom.isEmpty {
-                                Text(course.classroom)
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
+    private var coursesSection: some View {
+        Card(padding: 16) {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Text("今日课程")
+                        .font(AppTheme.Fonts.title2)
+                        .foregroundColor(AppTheme.Colors.primaryText)
+                        .tracking(-0.3)
+                    Spacer()
+                    NavigationLink {
+                        ScheduleView()
+                    } label: {
+                        HStack(spacing: 2) {
+                            Text("课表")
+                                .font(AppTheme.Fonts.caption.weight(.semibold))
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 9, weight: .semibold))
                         }
-                        .padding(.vertical, 10)
-                        .padding(.horizontal, 12)
-                        if index < todayCourses.count - 1 {
-                            Divider().padding(.leading, 80)
+                        .foregroundColor(AppTheme.Colors.accent)
+                    }
+                }
+
+                let todayCourses = viewModel.todayCourses()
+                if todayCourses.isEmpty {
+                    HStack {
+                        Spacer()
+                        VStack(spacing: 6) {
+                            Image(systemName: "moon.zzz.fill")
+                                .font(.system(size: 24))
+                                .foregroundColor(AppTheme.Colors.tertiaryText)
+                            Text("今天没有排课")
+                                .font(AppTheme.Fonts.footnote)
+                                .foregroundColor(AppTheme.Colors.tertiaryText)
+                        }
+                        Spacer()
+                    }
+                    .padding(.vertical, 20)
+                } else {
+                    VStack(spacing: 0) {
+                        ForEach(Array(todayCourses.enumerated()), id: \.element.id) { index, course in
+                            HStack(spacing: 12) {
+                                Text("第\(course.period)节")
+                                    .font(AppTheme.Fonts.caption.weight(.semibold))
+                                    .foregroundColor(AppTheme.Colors.accent)
+                                    .frame(width: 52, alignment: .leading)
+                                Text(course.subject)
+                                    .font(AppTheme.Fonts.body.weight(.medium))
+                                    .foregroundColor(AppTheme.Colors.primaryText)
+                                if !course.teacher.isEmpty {
+                                    Text(course.teacher)
+                                        .font(AppTheme.Fonts.caption2)
+                                        .foregroundColor(AppTheme.Colors.tertiaryText)
+                                }
+                                Spacer()
+                                if !course.classroom.isEmpty {
+                                    Text(course.classroom)
+                                        .font(AppTheme.Fonts.caption2)
+                                        .foregroundColor(AppTheme.Colors.tertiaryText)
+                                }
+                            }
+                            .padding(.vertical, 10)
+                            if index < todayCourses.count - 1 {
+                                Divider()
+                                    .background(AppTheme.Colors.separator)
+                                    .padding(.leading, 64)
+                            }
                         }
                     }
                 }
-                .background(Color(.secondarySystemGroupedBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             }
         }
     }
 
     // MARK: - 今日待办
     private var todoSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("今日待办")
-                    .font(.headline)
-                Spacer()
-                Button {
-                    showingAddTodo = true
-                } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title3)
-                        .foregroundColor(.accentColor)
+        Card(padding: 16) {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Text("今日待办")
+                        .font(AppTheme.Fonts.title2)
+                        .foregroundColor(AppTheme.Colors.primaryText)
+                        .tracking(-0.3)
+                    Spacer()
+                    Button {
+                        showingAddTodo = true
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 20))
+                            .foregroundColor(AppTheme.Colors.accent)
+                    }
+                    .buttonStyle(.plain)
                 }
-            }
 
-            let pending = viewModel.pendingTodos
-            if pending.isEmpty {
-                Text("没有待办事项")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.vertical, 20)
-                    .background(Color(.secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-            } else {
-                VStack(spacing: 0) {
-                    ForEach(Array(pending.enumerated()), id: \.element.id) { index, todo in
-                        HStack(spacing: 12) {
-                            Button {
-                                viewModel.toggleTodo(todo)
-                            } label: {
-                                Image(systemName: "circle")
-                                    .foregroundColor(.secondary)
-                            }
-                            Text(todo.title)
-                                .font(.body)
-                            Spacer()
-                            Button {
-                                viewModel.deleteTodo(todo)
-                            } label: {
-                                Image(systemName: "trash")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
+                let pending = viewModel.pendingTodos
+                if pending.isEmpty {
+                    HStack {
+                        Spacer()
+                        VStack(spacing: 6) {
+                            Image(systemName: "checkmark.seal.fill")
+                                .font(.system(size: 24))
+                                .foregroundColor(AppTheme.Colors.tertiaryText)
+                            Text("没有待办事项")
+                                .font(AppTheme.Fonts.footnote)
+                                .foregroundColor(AppTheme.Colors.tertiaryText)
                         }
-                        .padding(.vertical, 10)
-                        .padding(.horizontal, 12)
-                        if index < pending.count - 1 {
-                            Divider().padding(.leading, 44)
+                        Spacer()
+                    }
+                    .padding(.vertical, 20)
+                } else {
+                    VStack(spacing: 0) {
+                        ForEach(Array(pending.enumerated()), id: \.element.id) { index, todo in
+                            HStack(spacing: 12) {
+                                Button {
+                                    withAnimation(.spring(response: 0.25, dampingFraction: 0.7)) {
+                                        viewModel.toggleTodo(todo)
+                                    }
+                                } label: {
+                                    ZStack {
+                                        RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                            .stroke(AppTheme.Colors.tertiaryText, lineWidth: 1.5)
+                                            .frame(width: 22, height: 22)
+                                    }
+                                }
+                                .buttonStyle(.plain)
+
+                                Text(todo.title)
+                                    .font(AppTheme.Fonts.body)
+                                    .foregroundColor(AppTheme.Colors.primaryText)
+                                Spacer()
+                                Button {
+                                    viewModel.deleteTodo(todo)
+                                } label: {
+                                    Image(systemName: "xmark")
+                                        .font(.system(size: 12, weight: .semibold))
+                                        .foregroundColor(AppTheme.Colors.tertiaryText)
+                                        .frame(width: 24, height: 24)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                            .padding(.vertical, 10)
+                            if index < pending.count - 1 {
+                                Divider()
+                                    .background(AppTheme.Colors.separator)
+                                    .padding(.leading, 34)
+                            }
                         }
                     }
                 }
-                .background(Color(.secondarySystemGroupedBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             }
         }
     }
