@@ -401,7 +401,7 @@ struct StudentDetailView: View {
         .background(AppTheme.Colors.background)
     }
 
-    private func detailSection<Content: View>(title: String, systemImage: String, @ViewBuilder content: () -> Content) -> some View {
+    private func detailSection<Content: View>(title: String, systemImage: String, @ViewBuilder content: @escaping () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 6) {
                 Image(systemName: systemImage)
