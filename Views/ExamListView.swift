@@ -583,7 +583,8 @@ struct ScoreCSVImportView: View {
                                 ForEach(Array(parsedRows.prefix(3).enumerated()), id: \.offset) { _, row in
                                     HStack(spacing: 0) {
                                         ForEach(0..<min(row.count, headers.count), id: \.self) { idx in
-                                            let cellText = row.indices.contains(idx) ? row[idx] : ""
+                                            let hasCell = row.indices.contains(idx)
+                                            let cellText = hasCell ? row[idx] : ""
                                             Text(cellText)
                                                 .font(.system(size: 10))
                                                 .foregroundColor(AppTheme.Colors.primaryText)

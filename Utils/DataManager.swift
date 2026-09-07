@@ -115,9 +115,11 @@ class DataManager {
         let notifications = loadNotifications() ?? []
         let albumFolders = loadAlbumFolders() ?? []
         let albumPhotos = loadAlbumPhotos() ?? []
+        let semesters = loadSemesters() ?? []
         let backup = AllDataBackup(
             classInfo: classInfo,
             students: students,
+            semesters: semesters,
             exams: exams,
             scoreRecords: scoreRecords,
             courses: courses,
