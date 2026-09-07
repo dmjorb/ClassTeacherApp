@@ -582,14 +582,9 @@ struct ScoreCSVImportView: View {
 
                                 ForEach(Array(parsedRows.prefix(3).enumerated()), id: \.offset) { _, row in
                                     HStack(spacing: 0) {
-                                        ForEach(0..<min(row.count, headers.count), id: \.self) { idx in
-                                            let hasCell = row.indices.contains(idx)
-                                            let cellText = hasCell ? row[idx] : ""
-                                            Text(cellText)
-                                                .font(.system(size: 10))
-                                                .foregroundColor(AppTheme.Colors.primaryText)
-                                                .frame(maxWidth: .infinity)
-                                                .padding(.vertical, 6)
+                                        let colCount = min(row.count, headers.count)
+                                        ForEach(0..<colCount, id: \.self) { idx in
+                                            csvPreviewCell(row: row, idx: idx)
                                         }
                                     }
                                     Divider().background(AppTheme.Colors.separator)
@@ -646,6 +641,15 @@ struct ScoreCSVImportView: View {
                 break
             }
         }
+    }
+
+    private func csvPreviewCell(row: [String], idx: Int) -> some View {
+        let text = row.indices.contains(idx) ? row[idx] : ""
+        return Text(text)
+            .font(.system(size: 10))
+            .foregroundColor(AppTheme.Colors.primaryText)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 6)
     }
 
     // 解析 CSV
