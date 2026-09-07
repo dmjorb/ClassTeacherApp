@@ -511,31 +511,9 @@ struct ScoreCSVImportView: View {
                                     .foregroundColor(AppTheme.Colors.tertiaryText)
                             } else {
                                 ForEach(sortedExams) { exam in
-                                    Button {
+                                    ExamSelectRow(exam: exam, isSelected: selectedExamId == exam.id) {
                                         selectedExamId = exam.id
-                                    } label: {
-                                        HStack(spacing: 12) {
-                                            Image(systemName: selectedExamId == exam.id ? "checkmark.circle.fill" : "circle")
-                                                .foregroundColor(selectedExamId == exam.id ? AppTheme.Colors.accent : AppTheme.Colors.tertiaryText)
-                                            VStack(alignment: .leading, spacing: 2) {
-                                                Text(exam.name)
-                                                    .font(AppTheme.Fonts.body.weight(.medium))
-                                                    .foregroundColor(AppTheme.Colors.primaryText)
-                                                Text(examSubtitle(for: exam))
-                                                    .font(AppTheme.Fonts.caption2)
-                                                    .foregroundColor(AppTheme.Colors.tertiaryText)
-                                            }
-                                            Spacer()
-                                        }
-                                        .padding(12)
-                                        .background(selectedExamId == exam.id ? AppTheme.Colors.accentSoft : AppTheme.Colors.cardBackground)
-                                        .clipShape(RoundedRectangle(cornerRadius: AppTheme.CornerRadius.element, style: .continuous))
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: AppTheme.CornerRadius.element, style: .continuous)
-                                                .stroke(selectedExamId == exam.id ? AppTheme.Colors.accent : AppTheme.Colors.separator, lineWidth: selectedExamId == exam.id ? 1.5 : 0.5)
-                                        )
                                     }
-                                    .buttonStyle(.plain)
                                 }
                             }
                         }
@@ -643,7 +621,39 @@ struct ScoreCSVImportView: View {
         }
     }
 
-    private func examSubtitle(for exam: Exam) -> String {
+struct ExamSelectRow: View {
+    let exam: Exam
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .foregroundColor(isSelected ? AppTheme.Colors.accent : AppTheme.Colors.tertiaryText)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(exam.name)
+                        .font(AppTheme.Fonts.body.weight(.medium))
+                        .foregroundColor(AppTheme.Colors.primaryText)
+                    Text("\(exam.type.rawValue) · \(exam.subjects.count) 科")
+                        .font(AppTheme.Fonts.caption2)
+                        .foregroundColor(AppTheme.Colors.tertiaryText)
+                }
+                Spacer()
+            }
+            .padding(12)
+            .background(isSelected ? AppTheme.Colors.accentSoft : AppTheme.Colors.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: AppTheme.CornerRadius.element, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: AppTheme.CornerRadius.element, style: .continuous)
+                    .stroke(isSelected ? AppTheme.Colors.accent : AppTheme.Colors.separator, lineWidth: isSelected ? 1.5 : 0.5)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private func examSubtitle(for exam: Exam) -> String {
         "\(exam.type.rawValue) · \(exam.subjects.count) 科"
     }
 
