@@ -435,172 +435,10 @@ struct ScoreCSVImportView: View {
     var body: some View {
         Group {
             if parsedRows.isEmpty {
-                // 初始状态：选择文件
-                VStack(spacing: 24) {
-                    Spacer()
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 24, style: .continuous)
-                            .fill(AppTheme.Colors.accent.opacity(0.1))
-                            .frame(width: 96, height: 96)
-                        Image(systemName: "square.and.arrow.down.on.square")
-                            .font(.system(size: 40, weight: .semibold))
-                            .foregroundColor(AppTheme.Colors.accent)
-                    }
-
-                    VStack(spacing: 8) {
-                        Text("导入 CSV 成绩")
-                            .font(AppTheme.Fonts.title2)
-                            .foregroundColor(AppTheme.Colors.primaryText)
-                        Text("CSV 格式：学号,姓名,科目1,科目2,...\n第一行为表头")
-                            .font(AppTheme.Fonts.footnote)
-                            .foregroundColor(AppTheme.Colors.tertiaryText)
-                            .multilineTextAlignment(.center)
-                    }
-
-                    Button {
-                        showingFilePicker = true
-                    } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: "doc.badge.plus")
-                                .font(.system(size: 16, weight: .semibold))
-                            Text("选择 CSV 文件")
-                                .font(AppTheme.Fonts.headline)
-                        }
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(AppTheme.Colors.accentGradient)
-                        .clipShape(RoundedRectangle(cornerRadius: AppTheme.CornerRadius.button, style: .continuous))
-                        .rdShadow(AppTheme.Shadows.accent)
-                    }
-                    .buttonStyle(.plain)
-                    .padding(.horizontal, 32)
-
-                    Spacer()
-                }
-                .background(AppTheme.Colors.background)
+                initialView
             } else if importResult == nil {
-                // 预览 + 选择考试
-                ScrollView {
-                    VStack(spacing: 16) {
-                        // 文件信息
-                        HStack {
-                            Image(systemName: "doc.text")
-                                .foregroundColor(AppTheme.Colors.accent)
-                            Text(fileName)
-                                .font(AppTheme.Fonts.subheadline.weight(.medium))
-                                .foregroundColor(AppTheme.Colors.primaryText)
-                            Spacer()
-                            Text("\(parsedRows.count) 行")
-                                .font(AppTheme.Fonts.caption)
-                                .foregroundColor(AppTheme.Colors.tertiaryText)
-                        }
-                        .padding(14)
-                        .background(AppTheme.Colors.cardBackground)
-                        .clipShape(RoundedRectangle(cornerRadius: AppTheme.CornerRadius.element, style: .continuous))
-
-                        // 选择考试
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text("选择目标考试")
-                                .font(AppTheme.Fonts.title3)
-                                .foregroundColor(AppTheme.Colors.primaryText)
-
-                            if sortedExams.isEmpty {
-                                Text("请先创建考试")
-                                    .font(AppTheme.Fonts.footnote)
-                                    .foregroundColor(AppTheme.Colors.tertiaryText)
-                            } else {
-                                ForEach(sortedExams) { exam in
-                                    ExamSelectRow(exam: exam, isSelected: selectedExamId == exam.id) {
-                                        selectedExamId = exam.id
-                                    }
-                                }
-                            }
-                        }
-
-                        // 科目列预览
-                        if !subjectColumns.isEmpty {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("识别到 \(subjectColumns.count) 个科目列")
-                                    .font(AppTheme.Fonts.caption.weight(.semibold))
-                                    .foregroundColor(AppTheme.Colors.tertiaryText)
-                                HStack(spacing: 6) {
-                                    ForEach(subjectColumns, id: \.self) { subject in
-                                        Text(subject)
-                                            .font(AppTheme.Fonts.caption2)
-                                            .foregroundColor(AppTheme.Colors.accent)
-                                            .padding(.horizontal, 8)
-                                            .padding(.vertical, 4)
-                                            .background(AppTheme.Colors.accentSoft)
-                                            .clipShape(Capsule())
-                                    }
-                                }
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-
-                        // 数据预览（前3行）
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("数据预览（前 3 行）")
-                                .font(AppTheme.Fonts.caption.weight(.semibold))
-                                .foregroundColor(AppTheme.Colors.tertiaryText)
-
-                            VStack(spacing: 0) {
-                                // 表头
-                                HStack(spacing: 0) {
-                                    ForEach(headers, id: \.self) { header in
-                                        Text(header)
-                                            .font(.system(size: 10, weight: .semibold))
-                                            .foregroundColor(AppTheme.Colors.secondaryText)
-                                            .frame(maxWidth: .infinity)
-                                            .padding(.vertical, 6)
-                                    }
-                                }
-                                .background(AppTheme.Colors.subtleBackground)
-
-                                ForEach(Array(parsedRows.prefix(3).enumerated()), id: \.offset) { _, row in
-                                    HStack(spacing: 0) {
-                                        let colCount = min(row.count, headers.count)
-                                        ForEach(0..<colCount, id: \.self) { idx in
-                                            csvPreviewCell(row: row, idx: idx)
-                                        }
-                                    }
-                                    Divider().background(AppTheme.Colors.separator)
-                                }
-                            }
-                            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                    .stroke(AppTheme.Colors.separator, lineWidth: 0.5)
-                            )
-                        }
-
-                        Spacer(minLength: 20)
-
-                        // 导入按钮
-                        Button {
-                            performImport()
-                        } label: {
-                            HStack(spacing: 8) {
-                                Image(systemName: "square.and.arrow.down")
-                                    .font(.system(size: 16, weight: .semibold))
-                                Text("确认导入")
-                                    .font(AppTheme.Fonts.headline)
-                            }
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .background(selectedExamId != nil ? AppTheme.Colors.accentGradient : Color.gray.opacity(0.3))
-                            .clipShape(RoundedRectangle(cornerRadius: AppTheme.CornerRadius.button, style: .continuous))
-                        }
-                        .buttonStyle(.plain)
-                        .disabled(selectedExamId == nil)
-                    }
-                    .padding(18)
-                }
-                .background(AppTheme.Colors.background)
+                previewView
             } else {
-                // 导入结果
                 importResultView
             }
         }
@@ -620,7 +458,155 @@ struct ScoreCSVImportView: View {
             }
         }
     }
+    @ViewBuilder
+    private var initialView: some View {
+        VStack(spacing: 24) {
+            Spacer()
+            ZStack {
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .fill(AppTheme.Colors.accent.opacity(0.1))
+                    .frame(width: 96, height: 96)
+                Image(systemName: "square.and.arrow.down.on.square")
+                    .font(.system(size: 40, weight: .semibold))
+                    .foregroundColor(AppTheme.Colors.accent)
+            }
+            VStack(spacing: 8) {
+                Text("导入 CSV 成绩")
+                    .font(AppTheme.Fonts.title2)
+                    .foregroundColor(AppTheme.Colors.primaryText)
+                Text("CSV 格式：学号,姓名,科目1,科目2,...\n第一行为表头")
+                    .font(AppTheme.Fonts.footnote)
+                    .foregroundColor(AppTheme.Colors.tertiaryText)
+                    .multilineTextAlignment(.center)
+            }
+            Button {
+                showingFilePicker = true
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "doc.badge.plus")
+                        .font(.system(size: 16, weight: .semibold))
+                    Text("选择 CSV 文件")
+                        .font(AppTheme.Fonts.headline)
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(AppTheme.Colors.accentGradient)
+                .clipShape(RoundedRectangle(cornerRadius: AppTheme.CornerRadius.button, style: .continuous))
+                .rdShadow(AppTheme.Shadows.accent)
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 32)
+            Spacer()
+        }
+        .background(AppTheme.Colors.background)
+    }
 
+    @ViewBuilder
+    private var previewView: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                HStack {
+                    Image(systemName: "doc.text")
+                        .foregroundColor(AppTheme.Colors.accent)
+                    Text(fileName)
+                        .font(AppTheme.Fonts.subheadline.weight(.medium))
+                        .foregroundColor(AppTheme.Colors.primaryText)
+                    Spacer()
+                    Text("$($parsedRows.Count) 行")
+                        .font(AppTheme.Fonts.caption)
+                        .foregroundColor(AppTheme.Colors.tertiaryText)
+                }
+                .padding(14)
+                .background(AppTheme.Colors.cardBackground)
+                .clipShape(RoundedRectangle(cornerRadius: AppTheme.CornerRadius.element, style: .continuous))
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("选择目标考试")
+                        .font(AppTheme.Fonts.title3)
+                        .foregroundColor(AppTheme.Colors.primaryText)
+                    if sortedExams.isEmpty {
+                        Text("请先创建考试")
+                            .font(AppTheme.Fonts.footnote)
+                            .foregroundColor(AppTheme.Colors.tertiaryText)
+                    } else {
+                        ForEach(sortedExams) { exam in
+                            ExamSelectRow(exam: exam, isSelected: selectedExamId == exam.id) {
+                                selectedExamId = exam.id
+                            }
+                        }
+                    }
+                }
+                if !subjectColumns.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("识别到 $($subjectColumns.Count) 个科目列")
+                            .font(AppTheme.Fonts.caption.weight(.semibold))
+                            .foregroundColor(AppTheme.Colors.tertiaryText)
+                        HStack(spacing: 6) {
+                            ForEach(subjectColumns, id: \.self) { subject in
+                                Text(subject)
+                                    .font(AppTheme.Fonts.caption2)
+                                    .foregroundColor(AppTheme.Colors.accent)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 4)
+                                    .background(AppTheme.Colors.accentSoft)
+                                    .clipShape(Capsule())
+                            }
+                        }
+                    }
+                }
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("数据预览（前 3 行）")
+                        .font(AppTheme.Fonts.caption.weight(.semibold))
+                        .foregroundColor(AppTheme.Colors.tertiaryText)
+                    VStack(spacing: 0) {
+                        HStack(spacing: 0) {
+                            ForEach(headers, id: \.self) { header in
+                                Text(header)
+                                    .font(.system(size: 10, weight: .semibold))
+                                    .foregroundColor(AppTheme.Colors.secondaryText)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 6)
+                            }
+                        }
+                        .background(AppTheme.Colors.subtleBackground)
+                        ForEach(Array(parsedRows.prefix(3).enumerated()), id: \.offset) { _, row in
+                            HStack(spacing: 0) {
+                                ForEach(0..<min(row.count, headers.count), id: \.self) { idx in
+                                    csvPreviewCell(row: row, idx: idx)
+                                }
+                            }
+                            Divider().background(AppTheme.Colors.separator)
+                        }
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .stroke(AppTheme.Colors.separator, lineWidth: 0.5)
+                    )
+                }
+                Spacer(minLength: 20)
+                Button {
+                    performImport()
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "square.and.arrow.down")
+                            .font(.system(size: 16, weight: .semibold))
+                        Text("确认导入")
+                            .font(AppTheme.Fonts.headline)
+                    }
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(selectedExamId != nil ? AppTheme.Colors.accentGradient : Color.gray.opacity(0.3))
+                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.CornerRadius.button, style: .continuous))
+                }
+                .buttonStyle(.plain)
+                .disabled(selectedExamId == nil)
+            }
+            .padding(18)
+        }
+        .background(AppTheme.Colors.background)
+    }
 struct ExamSelectRow: View {
     let exam: Exam
     let isSelected: Bool
