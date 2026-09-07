@@ -82,13 +82,13 @@ struct ProfileView: View {
                         .padding(.leading, 52)
 
                     settingsRow(icon: "square.grid.2x2.fill", title: "首页布局设置", color: .teal) {
-                        SettingsView()
+                        HomeFeatureManagerView()
                     }
                     Divider()
                         .background(AppTheme.Colors.separator)
                         .padding(.leading, 52)
                     settingsRow(icon: "star.fill", title: "常用功能管理", color: .yellow) {
-                        SettingsView()
+                        HomeFeatureManagerView()
                     }
                 }
 

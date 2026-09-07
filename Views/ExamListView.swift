@@ -340,6 +340,7 @@ struct SemesterManagerView: View {
     @EnvironmentObject var viewModel: AppViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var showingAdd = false
+    @State private var newSemesterName = ""
 
     var body: some View {
         Group {

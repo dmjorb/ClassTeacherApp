@@ -498,6 +498,8 @@ struct StudentFormView: View {
     @State private var groupNumber = 1
     @State private var dormitory = ""
     @State private var notes = ""
+    @State private var seatRow = 0
+    @State private var seatCol = 0
 
     private var isEditing: Bool {
         if case .edit = mode { return true }
@@ -526,6 +528,17 @@ struct StudentFormView: View {
                 TextField("家长电话", text: $parentPhone)
                     .keyboardType(.phonePad)
                 TextField("家庭住址", text: $address)
+            }
+            Section("座位") {
+                Picker("排", selection: $seatRow) {
+                    Text("未排座").tag(0)
+                    ForEach(1...7, id: \.self) { Text("第\($0)排").tag($0) }
+                }
+                if seatRow > 0 {
+                    Picker("列", selection: $seatCol) {
+                        ForEach(1...5, id: \.self) { Text("第\($0)列").tag($0) }
+                    }
+                }
             }
             Section("宿舍") {
                 TextField("宿舍号", text: $dormitory)
@@ -556,6 +569,8 @@ struct StudentFormView: View {
                 groupNumber = student.groupNumber
                 dormitory = student.dormitory
                 notes = student.notes
+                seatRow = student.seatRow
+                seatCol = student.seatCol
             }
         }
     }
@@ -568,7 +583,7 @@ struct StudentFormView: View {
             viewModel.addStudent(Student(
                 name: trimmed, studentNumber: studentNumber, gender: gender,
                 phone: phone, parentPhone: parentPhone, address: address,
-                groupNumber: groupNumber, dormitory: dormitory, notes: notes
+                groupNumber: groupNumber, dormitory: dormitory, notes: notes, seatRow: seatRow, seatCol: seatCol
             ))
         case .edit(let student):
             var updated = student

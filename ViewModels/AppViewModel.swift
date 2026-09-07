@@ -1,4 +1,4 @@
-import Foundation
+﻿import Foundation
 import SwiftUI
 import Combine
 
@@ -35,7 +35,7 @@ class AppViewModel: ObservableObject {
     // 默认功能列表
     static let defaultHomeFeatures: [HomeFeature] = [
         HomeFeature(id: "schedule", name: "课表", systemImage: "calendar", isVisible: true, order: 0),
-        HomeFeature(id: "duty", name: "值日", systemImage: "broom", isVisible: true, order: 1),
+        HomeFeature(id: "duty", name: "值日", systemImage: "paintbrush", isVisible: true, order: 1),
         HomeFeature(id: "seat", name: "座位", systemImage: "rectangle.grid.3x3", isVisible: true, order: 2),
         HomeFeature(id: "map", name: "班级地图", systemImage: "map", isVisible: true, order: 3),
         HomeFeature(id: "album", name: "相册", systemImage: "photo.on.rectangle", isVisible: true, order: 4),

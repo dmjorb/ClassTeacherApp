@@ -95,6 +95,7 @@ struct HomeView: View {
                         .font(AppTheme.Fonts.caption2)
                         .foregroundColor(AppTheme.Colors.tertiaryText)
                 }
+                .frame(minWidth: 70, alignment: .trailing)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -115,9 +116,9 @@ struct HomeView: View {
                 StatCard(value: "\(viewModel.pendingTodos.count)", label: "待办",
                          systemImage: "checklist", color: .green)
             }
-            .frame(width: 108)
+            .frame(width: 100)
         }
-        .frame(height: 120)
+        .frame(height: 112)
     }
 
     // MARK: - 功能入口（4 列紧凑网格，用户可自定义）
